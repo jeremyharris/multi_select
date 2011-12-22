@@ -84,13 +84,14 @@ class MultiSelectHelper extends AppHelper {
 		
 		$defaultOptions = array(
 			'hiddenField' => false,
-			'class' => 'multi-select-box',
+			'class' => '',
 			'data-multiselect-token' => $this->token
 		);
 		
 		$options = array_merge($defaultOptions, $options);
 		$options['id'] = $uid;
 		$options['value'] = $value;
+		$options['class'] .= ' multi-select-box';
 		
 		if (in_array($value, $this->selected)) {
 			$options['checked'] = 'checked';
