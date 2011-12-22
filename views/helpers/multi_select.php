@@ -84,7 +84,8 @@ class MultiSelectHelper extends AppHelper {
 		
 		$defaultOptions = array(
 			'hiddenField' => false,
-			'class' => 'multi-select-box'
+			'class' => 'multi-select-box',
+			'data-multiselect-token' => $this->token
 		);
 		
 		$options = array_merge($defaultOptions, $options);
@@ -122,7 +123,7 @@ class MultiSelectHelper extends AppHelper {
 			'ext' => 'json'
 		));
 		
-		$this->Js->get('.multi-select-box');
+		$this->Js->get(".multi-select-box[data-multiselect-token=$this->token]");
 		$each = <<<JS
 checked ? this.setAttribute('checked', 'checked') : this.removeAttribute('checked');
 if (document.createEventObject){
@@ -141,7 +142,6 @@ JS;
 			'method' => 'get',
 			'dataType' => 'json'
 		));
-		$this->Js->get('.multi-select-box');
 		$this->Js->event('click', $request.$clickall, array('stop' => false));
 	}
 }
