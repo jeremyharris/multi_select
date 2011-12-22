@@ -113,7 +113,7 @@ class MultiSelectHelper extends AppHelper {
 		App::import('Component', 'Session');
 		$Session = new SessionComponent();
 		$Session->write('MultiSelect.'.$this->token.'.page', $this->page);
-
+		
 		$url = Router::url(array(
 			'controller' => 'selects',
 			'action' => 'session',
@@ -122,6 +122,19 @@ class MultiSelectHelper extends AppHelper {
 			'ext' => 'json'
 		));
 		
+		$this->Js->get('.multi-select-box');
+		$each = <<<JS
+checked ? this.setAttribute('checked', 'checked') : this.removeAttribute('checked');
+if (document.createEventObject){
+	this.fireEvent('onchange', document.createEventObject())
+} else {
+	var evt = document.createEvent("HTMLEvents")
+	evt.initEvent('change', true, true);
+	this.dispatchEvent(evt);
+};
+JS;
+		$each = $this->Js->each($each, array('buffer' => false));
+		$clickall = " if (this.value == 'all') {var checked = this.checked; $each}";
 		$request = $this->Js->request($url, array(
 			'dataExpression' => true,
 			'data' => '{value:this.value,selected:this.checked}',
@@ -129,6 +142,6 @@ class MultiSelectHelper extends AppHelper {
 			'dataType' => 'json'
 		));
 		$this->Js->get('.multi-select-box');
-		$this->Js->event('click', $request, array('stop' => false));
+		$this->Js->event('click', $request.$clickall, array('stop' => false));
 	}
 }
