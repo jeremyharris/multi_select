@@ -76,10 +76,6 @@ class MultiSelectHelper extends AppHelper {
  * @access public
  */ 
 	function checkbox($value = '', $options = array()) {
-		if (!is_numeric($value) && is_string($value) && $value != 'all') {
-			return null;
-		}
-
 		$uid = String::uuid();
 		
 		$defaultOptions = array(
@@ -99,7 +95,7 @@ class MultiSelectHelper extends AppHelper {
 
 		$output = $this->Form->checkbox('', $options);
 		
-		if (is_numeric($value)) {
+		if ($value !== 'all') {
 			$this->page[] = $value;
 		}
 
