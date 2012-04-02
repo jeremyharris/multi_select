@@ -75,6 +75,48 @@ class MultiSelectComponentTest extends CakeTestCase {
 		unset($this->Controller->params['named']['mstoken']);
 		$this->MultiSelect->startup();
 	}
+	
+	function testExpiration() {
+		$tokens = array(
+			'test1' => array(
+				'selected' => array(),
+				'search' => array(),
+				'page' => array(1),
+				'created' => strtotime('yesterday')
+			),
+			'test2' => array(
+				'selected' => array(),
+				'search' => array(),
+				'page' => array(2),
+				'created' => strtotime('now')
+			),
+			'test3' => array(
+				'selected' => array(),
+				'search' => array(),
+				'page' => array(3),
+				'created' => strtotime('+1 day')
+			)
+		);
+		$this->MultiSelect->Session->write('MultiSelect', $tokens);
+		$this->MultiSelect->startup();
+		
+		$results = $this->MultiSelect->Session->read('MultiSelect');
+		$expected = array(
+			'test2' => array(
+				'selected' => array(),
+				'search' => array(),
+				'page' => array(2),
+				'created' => strtotime('now')
+			),
+			'test3' => array(
+				'selected' => array(),
+				'search' => array(),
+				'page' => array(3),
+				'created' => strtotime('+1 day')
+			)
+		);
+		$this->assertEqual($results, $expected);
+	}
 
 	function testStartup() {
 		$uidReg = "/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/";

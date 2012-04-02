@@ -73,8 +73,9 @@ class MultiSelectComponent extends Object {
 		
 		if ($this->check()) {
 			$currentTokens = $this->Session->read('MultiSelect');
+			$expires = strtotime('-10 minutes');
 			foreach ($currentTokens as $token => $values) {
-				if (isset($values['created']) && $values['created'] > strtotime('+10 minutes')) {
+				if (isset($values['created']) && $values['created'] < $expires) {
 					$this->Session->delete('MultiSelect.'.$token);
 				}
 			}
