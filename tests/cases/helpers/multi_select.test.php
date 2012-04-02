@@ -104,7 +104,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => 'multi-select-box'
+				'class' => ' multi-select-box',
+				'data-multiselect-token' => 'preg:/'.$uidReg.'/'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -116,7 +117,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => 'multi-select-box'
+				'class' => ' multi-select-box',
+				'data-multiselect-token' => 'preg:/'.$uidReg.'/'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -128,7 +130,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => 'multi-select-box'
+				'class' => ' multi-select-box',
+				'data-multiselect-token' => 'preg:/'.$uidReg.'/'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -140,7 +143,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => 'multi-select-box'
+				'class' => ' multi-select-box',
+				'data-multiselect-token' => 'preg:/'.$uidReg.'/'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -152,7 +156,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => 'myclass'
+				'class' => 'myclass multi-select-box',
+				'data-multiselect-token' => 'preg:/'.$uidReg.'/'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -165,7 +170,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => 'multi-select-box'
+				'class' => ' multi-select-box',
+				'data-multiselect-token' => 'preg:/'.$uidReg.'/'
 			))
 		);
 		$this->assertTags($result, $expected);
@@ -177,7 +183,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 'all',
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => 'multi-select-box'
+				'class' => ' multi-select-box',
+				'data-multiselect-token' => 'preg:/'.$uidReg.'/'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -191,29 +198,27 @@ class MultiSelectTest extends CakeTestCase {
 				'value' => 1,
 				'checked' => 'checked',
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => 'multi-select-box'
+				'class' => ' multi-select-box',
+				'data-multiselect-token' => 'preg:/'.$uidReg.'/'
 			)
 		);
 		$this->assertTags($result, $expected);
-
-		$result = $this->MultiSelect->checkbox('invalid');
-		$this->assertNull($result);
-
-		$result = $this->MultiSelect->checkbox();
-		$this->assertNull($result);
 	}
 
 	function testEnd() {
+		$uidReg = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
+		$selector = '\"\.multi-select-box\[data-multiselect-token='.$uidReg.'\]\"';
+		
 		$this->MultiSelect->end();
 		$buffer = $this->MultiSelect->Js->getBuffer();
-		$this->assertPattern('/\$\("\.multi-select-box"\)\.bind/', $buffer[0]);
+		$this->assertPattern('/\$\('.$selector.'\)\.bind/', $buffer[0]);
 		$this->assertPattern('/\.ajax/', $buffer[0]);
 		
 		$this->MultiSelect->Js =& new JsHelper(array('Prototype'));
 		$this->MultiSelect->Js->PrototypeEngine =& new PrototypeEngineHelper();
 		$this->MultiSelect->end();
 		$buffer = $this->MultiSelect->Js->getBuffer();
-		$this->assertPattern('/\$\$\("\.multi-select-box"\)\.observe/', $buffer[0]);
+		$this->assertPattern('/\$\$\('.$selector.'\)\.observe/', $buffer[0]);
 		$this->assertPattern('/new Ajax\.Request/', $buffer[0]);
 	}
 }
