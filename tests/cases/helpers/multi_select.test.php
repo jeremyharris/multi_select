@@ -91,8 +91,61 @@ class MultiSelectTest extends CakeTestCase {
 		));
 		$this->MultiSelect->create();
 		$this->assertNoErrors();
+		
+		$this->MultiSelect->params['named']['mstoken'] = 'test';
+		$this->Session->write('MultiSelect', array(
+			'test' => array(
+				'selected' => array(1, 2, 3),
+				'search' => array(),
+				'page' => array(),
+				'all' => true
+			)
+		));
+		$this->MultiSelect->create();
+		
+		$results = $this->MultiSelect->selected;
+		$expected = array(1, 2, 3);
+		$this->assertEqual($results, $expected);
+		
+		$results = $this->MultiSelect->all;
+		$this->assertTrue($results);
 	}
-
+	
+	function testCheckedAllBox() {
+		$uidReg = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
+		
+		$this->MultiSelect->selected = array();
+		$this->MultiSelect->all = true;
+		
+		$result = $this->MultiSelect->checkbox('all');
+		$expected = array(
+			'input' => array(
+				'type' => 'checkbox',
+				'name' => 'data[]',
+				'value' => 'all',
+				'id' => 'preg:/'.$uidReg.'/',
+				'class' => ' multi-select-box',
+				'checked' => 'checked',
+				'data-multiselect-token' => 'preg:/[a-z0-9]+/'
+			)
+		);
+		$this->assertTags($result, $expected);
+		
+		$result = $this->MultiSelect->checkbox(1);
+		$expected = array(
+			'input' => array(
+				'type' => 'checkbox',
+				'name' => 'data[]',
+				'value' => 1,
+				'id' => 'preg:/'.$uidReg.'/',
+				'class' => ' multi-select-box',
+				'disabled' => 'disabled',
+				'data-multiselect-token' => 'preg:/[a-z0-9]+/'
+			)
+		);
+		$this->assertTags($result, $expected);
+	}
+	
 	function testCheckbox() {
 		$this->MultiSelect->selected = array(1);
 		$uidReg = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
