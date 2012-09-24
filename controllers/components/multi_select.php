@@ -54,13 +54,10 @@ class MultiSelectComponent extends Object {
 	var $_token = null;
 	
 /**
- * Whether the 'check all' checkbox treats 'all' as the current page or all of
- * the search results
- * 
- * With `$usePages = true` checking the 'check all' box will add all of the
- * current page to the list of selected ids.
+ * Changes the behavior of the 'check all' box.
  * 
  * @var boolean
+ * @see README
  */
 	var $usePages = false;
 
@@ -103,10 +100,13 @@ class MultiSelectComponent extends Object {
 				'selected' => array(),
 				'search' => array(),
 				'page' => array(),
-				'created' => time()
+				'usePages' => $this->usePages,
+				'created' => time(),
+				'all' => false
 			));
 		} else {
 			$this->_token = $this->controller->params['named']['mstoken'];
+			$this->usePages = $this->Session->read('MultiSelect.'.$this->_token.'.usePages');
 		}
 	}
 
@@ -151,7 +151,11 @@ class MultiSelectComponent extends Object {
 		if (!$uid) {
 			$uid = $this->_token;
 		}
-		return $this->Session->read('MultiSelect.'.$uid.'.selected');
+		if ($this->Session->read('MultiSelect.'.$uid.'.all')) {
+			return 'all';
+		} else {
+			return $this->Session->read('MultiSelect.'.$uid.'.selected');
+		}
 	}
 
 /**
@@ -204,6 +208,9 @@ class MultiSelectComponent extends Object {
 	function selectAll() {
 		if ($this->usePages) {
 			return $this->merge($this->Session->read('MultiSelect.'.$this->_token.'.page'));
+		} else {
+			$this->_save(array());
+			return $this->Session->write('MultiSelect.'.$this->_token.'.all', true);
 		}
 	}
 
@@ -216,6 +223,9 @@ class MultiSelectComponent extends Object {
 	function deselectAll() {
 		if ($this->usePages) {
 			return $this->delete($this->Session->read('MultiSelect.'.$this->_token.'.page'));
+		} else {
+			$this->_save(array());
+			return $this->Session->write('MultiSelect.'.$this->_token.'.all', false);
 		}
 	}
 

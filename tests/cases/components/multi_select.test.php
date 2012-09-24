@@ -89,7 +89,9 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$expected = array(
 			'selected' => array(1),
 			'search' => array(),
-			'page' => array()
+			'page' => array(),
+			'usePages' => false,
+			'all' => false
 		);
 		$this->assertEqual($result, $expected);
 		
@@ -157,21 +159,28 @@ class MultiSelectComponentTest extends CakeTestCase {
 			'selected' => array(),
 			'search' => array(),
 			'page' => array(),
+			'usePages' => false,
+			'all' => false,
 			'created' => $now
 		);
 		$this->assertEqual($result, $expected);
-
+		
 		$this->Controller->params['named']['mstoken'] = $this->MultiSelect->_token;
 		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.page', array(1));
+		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.usePages', true);
 		$this->MultiSelect->startup();
 		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token);
 		$expected = array(
 			'selected' => array(),
 			'search' => array(),
 			'page' => array(1),
+			'usePages' => true,
+			'all' => false,
 			'created' => $now
 		);
 		$this->assertEqual($result, $expected);
+		
+		$this->assertTrue($this->MultiSelect->usePages);
 	}
 
 	function testCheck() {
@@ -285,6 +294,14 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$expected = array('1','2','3','4','5','6');
 		$result = $this->MultiSelect->selectAll();
 		$this->assertEqual($result, $expected);
+		
+		$this->MultiSelect->usePages = false;
+		$result = $this->MultiSelect->selectAll();
+		$this->assertTrue($result);
+		
+		$results = $this->MultiSelect->getSelected();
+		$expected = 'all';
+		$this->assertEqual($results, $expected);
 	}
 
 	function testdeselectAll() {
@@ -294,6 +311,14 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$expected = array('1','2','3');
 		$result = $this->MultiSelect->deselectAll();
 		$this->assertEqual($result, $expected);
+		
+		$this->MultiSelect->usePages = false;
+		$result = $this->MultiSelect->deselectAll();
+		$this->assertTrue($result);
+		
+		$results = $this->MultiSelect->getSelected();
+		$expected = array();
+		$this->assertEqual($results, $expected);
 	}
 
 }
