@@ -36,11 +36,8 @@ checkboxes.
 
 The helper also comes with 'check all' functionality. Simply pass 'all' to
 `MultiSelectHelper::checkbox()`'s value. The function of the 'check all' box
-depends on if you have the `$usePages` option set on the component.
-
-**`$usePages => true`**
-When `$usePages` is `true`, the check all box will treat "all" as "everything
-on that page". When you click it, the entire page is added to the selected items.
+depends on if you have the `$usePages` option set on the component (see more
+info below).
 
 ### Controller
 
@@ -75,6 +72,35 @@ And then in your controller
     function delete() {
         $selected = $this->MultiSelect->getSelected();
         // do stuff
+    }
+
+### Component options
+
+#### `usePages`
+
+The `$usePages` option on the component dictates the behavior of the 'check all'
+box.
+
+When `$usePages` is `true`, the check all box will treat "all" as "everything
+on that page". When you click it, the entire page is added to the selected items.
+
+When `$usePages` is `false`, the check all box mark that everything should be
+selected. Then you'll need to check for this case in your controller.
+
+    function delete() {
+        $selected = $this->MultiSelect->getSelected();
+        if ($selected === 'all') {
+            // find all from a saved search
+            $search = $this->MultiSelect->getSearch();
+            $results = $this->User->find('all', $search);
+            $selected = Set::extract('/User/id', $results);
+        }
+        foreach ($selected as $deleteMe) {
+            $this->User->delete($deleteMe);
+        }
+
+        $this->Session->setFlash(count($selected).' Users deleted.');
+        $this->redirect(array('action' => 'index'));
     }
 
 ## Future
