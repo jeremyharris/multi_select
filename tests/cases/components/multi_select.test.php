@@ -279,6 +279,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 	}
 
 	function testSelectAll() {
+		$this->MultiSelect->usePages = true;
 		$this->MultiSelect->merge(array('1','2','3'));
 		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.page', array('4','5','6'));
 		$expected = array('1','2','3','4','5','6');
@@ -287,6 +288,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 	}
 
 	function testdeselectAll() {
+		$this->MultiSelect->usePages = true;
 		$this->MultiSelect->merge(array('1','2','3','4','5','6'));
 		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.page', array('4','5','6'));
 		$expected = array('1','2','3');

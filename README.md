@@ -35,8 +35,12 @@ checkboxes.
     echo $this->MultiSelect->end();
 
 The helper also comes with 'check all' functionality. Simply pass 'all' to
-`MultiSelectHelper::checkbox()`'s value. When you click it, the entire page is
-selected.
+`MultiSelectHelper::checkbox()`'s value. The function of the 'check all' box
+depends on if you have the `$usePages` option set on the component.
+
+**`$usePages => true`**
+When `$usePages` is `true`, the check all box will treat "all" as "everything
+on that page". When you click it, the entire page is added to the selected items.
 
 ### Controller
 

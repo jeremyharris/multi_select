@@ -52,6 +52,17 @@ class MultiSelectComponent extends Object {
  * @access protected
  */
 	var $_token = null;
+	
+/**
+ * Whether the 'check all' checkbox treats 'all' as the current page or all of
+ * the search results
+ * 
+ * With `$usePages = true` checking the 'check all' box will add all of the
+ * current page to the list of selected ids.
+ * 
+ * @var boolean
+ */
+	var $usePages = false;
 
 /**
  * Start MultiSelectComponent for use in the controller
@@ -59,8 +70,9 @@ class MultiSelectComponent extends Object {
  * @param object $controller A reference to the controller
  * @access public
  */
-	function initialize(&$controller) {
-		$this->controller =& $controller;		
+	function initialize(&$controller,  $settings = array()) {
+		$this->controller =& $controller;	
+		$this->_set($settings);
 	}
 
 /**
@@ -190,7 +202,9 @@ class MultiSelectComponent extends Object {
  * @access public
  */			
 	function selectAll() {
-		return $this->merge($this->Session->read('MultiSelect.'.$this->_token.'.page'));
+		if ($this->usePages) {
+			return $this->merge($this->Session->read('MultiSelect.'.$this->_token.'.page'));
+		}
 	}
 
 /**
@@ -200,7 +214,9 @@ class MultiSelectComponent extends Object {
  * @access public
  */		
 	function deselectAll() {
-		return $this->delete($this->Session->read('MultiSelect.'.$this->_token.'.page'));
+		if ($this->usePages) {
+			return $this->delete($this->Session->read('MultiSelect.'.$this->_token.'.page'));
+		}
 	}
 
 /**

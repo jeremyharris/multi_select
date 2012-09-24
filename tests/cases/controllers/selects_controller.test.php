@@ -19,6 +19,12 @@ Mock::generatePartial('RequestHandlerComponent', 'MockRequestHandlerComponent', 
 class TestSelectsController extends SelectsController {
 	var $autoRender = false;
 	
+	var $components = array(
+		'MultiSelect.MultiSelect' => array(
+			'usePages' => true
+		)
+	);
+	
 	function redirect($url, $status = null, $exit = true) {
 		$this->redirectUrl = $url;
 	}
