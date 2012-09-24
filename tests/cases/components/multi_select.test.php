@@ -149,10 +149,8 @@ class MultiSelectComponentTest extends CakeTestCase {
 	}
 
 	function testStartup() {
-		$uidReg = "/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/";
-
 		$this->assertTrue($this->MultiSelect->Session->check('MultiSelect'));
-		$this->assertPattern($uidReg, $this->MultiSelect->_token);
+		$this->assertIsA($this->MultiSelect->_token, 'string');
 		$now = time();
 		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token);
 		$expected = array(

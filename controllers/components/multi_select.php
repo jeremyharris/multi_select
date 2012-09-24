@@ -85,7 +85,7 @@ class MultiSelectComponent extends Object {
 		}
 
 		if (!isset($this->controller->params['named']['mstoken']) || $this->RequestHandler->isPost()) {
-			$this->_token = String::uuid();
+			$this->_token = uniqid();
 			$this->controller->params['named']['mstoken'] = $this->_token;
 			$success = $this->Session->write('MultiSelect.'.$this->_token, array(
 				'selected' => array(),
