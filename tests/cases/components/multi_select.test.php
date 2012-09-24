@@ -53,6 +53,8 @@ class MultiSelectComponentTestController extends Controller {
 	}
 }
 
+Mock::generatePartial('RequestHandlerComponent', 'MockMultiSelectComponentRequestHandlerComponent', array('isPost'));
+
 /**
  * MultiSelectComponentTest class
  *
@@ -64,16 +66,44 @@ class MultiSelectComponentTest extends CakeTestCase {
 	function startCase() {
 		$this->Controller =& new MultiSelectComponentTestController(array('components' => array('RequestHandler')));
 		$this->Controller->constructClasses();
-		$this->Controller->RequestHandler->initialize($this->Controller);
 		$this->View =& new View($this->Controller);
 		$this->MultiSelect =& new MultiSelectComponent($this->Controller);
 		$this->MultiSelect->initialize($this->Controller);
 		$this->MultiSelect->Session =& new SessionComponent();
+		$this->MultiSelect->RequestHandler =& new MockMultiSelectComponentRequestHandlerComponent();
+		$this->MultiSelect->RequestHandler->initialize($this->Controller);
 	}
 
 	function startTest() {
 		unset($this->Controller->params['named']['mstoken']);
 		$this->MultiSelect->startup();
+	}
+	
+	function testNewSessionOnPost() {
+		$this->MultiSelect->RequestHandler->setReturnValueAt(0, 'isPost', false);
+		$this->Controller->params['named']['mstoken'] = $this->MultiSelect->_token;
+		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.selected', array(1));
+		$this->MultiSelect->startup();
+		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token);
+		unset($result['created']);
+		$expected = array(
+			'selected' => array(1),
+			'search' => array(),
+			'page' => array()
+		);
+		$this->assertEqual($result, $expected);
+		
+		$this->MultiSelect->RequestHandler->setReturnValueAt(1, 'isPost', false);
+		$this->MultiSelect->startup();
+		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected');
+		$expected = array(1);
+		$this->assertEqual($result, $expected);
+		
+		$this->MultiSelect->RequestHandler->setReturnValueAt(2, 'isPost', true);
+		$this->MultiSelect->startup();
+		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected');
+		$expected = array();
+		$this->assertEqual($result, $expected);
 	}
 	
 	function testExpiration() {

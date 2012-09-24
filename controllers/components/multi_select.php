@@ -40,7 +40,10 @@ class MultiSelectComponent extends Object {
  * @var array
  * @access public
  */ 
-	var $components = array('Session');
+	var $components = array(
+		'Session',
+		'RequestHandler'
+	);
 
 /**
  * Current token
@@ -81,7 +84,7 @@ class MultiSelectComponent extends Object {
 			}
 		}
 
-		if (!isset($this->controller->params['named']['mstoken'])) {
+		if (!isset($this->controller->params['named']['mstoken']) || $this->RequestHandler->isPost()) {
 			$this->_token = String::uuid();
 			$this->controller->params['named']['mstoken'] = $this->_token;
 			$success = $this->Session->write('MultiSelect.'.$this->_token, array(
