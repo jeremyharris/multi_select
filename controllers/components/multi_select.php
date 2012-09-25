@@ -83,7 +83,7 @@ class MultiSelectComponent extends Object {
 			$this->controller->params['named'] = array();
 		}
 		
-		if ($this->check()) {
+		if ($this->Session->check('MultiSelect')) {
 			$currentTokens = $this->Session->read('MultiSelect');
 			$expires = strtotime('-10 minutes');
 			foreach ($currentTokens as $token => $values) {
@@ -167,10 +167,9 @@ class MultiSelectComponent extends Object {
  */		
 	function check($uid = null) {
 		if (!$uid) {
-			return $this->Session->check('MultiSelect');
-		} else {
-			return $this->Session->check('MultiSelect.'.$uid);
+			$uid = $this->_token;
 		}
+		return $this->Session->check('MultiSelect.'.$uid);
 	}
 
 /**
