@@ -76,7 +76,21 @@ class MultiSelectComponentTest extends CakeTestCase {
 
 	function startTest() {
 		unset($this->Controller->params['named']['mstoken']);
+		unset($this->Controller->params['named']['mspersist']);
+		$this->MultiSelect->RequestHandler =& new MockMultiSelectComponentRequestHandlerComponent();
+		$this->MultiSelect->RequestHandler->initialize($this->Controller);
 		$this->MultiSelect->startup();
+	}
+	
+	function testPostPersist() {
+		$this->MultiSelect->RequestHandler->setReturnValue('isPost', true);
+		$this->Controller->params['named']['mspersist'] = 1;
+		$this->Controller->params['named']['mstoken'] = $this->MultiSelect->_token;
+		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.selected', array(1));
+		$this->MultiSelect->startup();
+		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected');
+		$expected = array(1);
+		$this->assertEqual($result, $expected);
 	}
 	
 	function testNewSessionOnPost() {

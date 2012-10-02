@@ -92,8 +92,10 @@ class MultiSelectComponent extends Object {
 				}
 			}
 		}
+		
+		$newRequest = !isset($this->controller->params['named']['mstoken']) || $this->RequestHandler->isPost();
 
-		if (!isset($this->controller->params['named']['mstoken']) || $this->RequestHandler->isPost()) {
+		if ($newRequest && !isset($this->controller->params['named']['mspersist'])) {
 			$this->_token = uniqid();
 			$this->controller->params['named']['mstoken'] = $this->_token;
 			$success = $this->Session->write('MultiSelect.'.$this->_token, array(

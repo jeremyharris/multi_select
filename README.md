@@ -74,6 +74,31 @@ And then in your controller
         // do stuff
     }
 
+#### Persisting across `POST` requests
+
+MultiSelect considers `POST` requests to be new requests and therefore resets. 
+This is useful for filter forms. Sometimes, however, you may want a `POST` action
+to take advantage of the selected items, such as a bulk edit function. To persist 
+the MultiSelect session, pass the `mspersist:1` named parameter to your action.
+
+    $this->Html->link('Bulk Edit', array(
+      'action' => 'edit', 
+      'mstoken' => $this->MultiSelect->token
+    ));
+
+In your edit form, include the named parameter:
+
+    $this->Form->create(array(
+      'url' => array(
+        'mspersist' => 1
+      )
+    ));
+    echo $this->Form->input('status');
+    echo $this->Form->end('Submit');
+
+When the form is submitted, MultiSelect will use the current session rather than
+starting a new, empty one.
+
 ### Component options
 
 #### `usePages`
