@@ -251,6 +251,6 @@ class MultiSelectComponent extends Object {
 		if (!$uid) {
 			$uid = $this->_token;
 		}
-		return $this->Session->read('MultiSelect.'.$this->_token.'.selected');
-	}	
+		return (array)$this->Session->read('MultiSelect.'.$uid.'.selected');
+	}
 }

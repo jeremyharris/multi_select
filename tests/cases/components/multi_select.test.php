@@ -250,7 +250,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertEqual($this->MultiSelect->getSearch(), $expected);
 	}
 
-	function test_get() {
+	function testGet() {
 		$expected = array();
 		$result = $this->MultiSelect->_get();
 		$this->assertEqual($expected, $result);
@@ -259,6 +259,10 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->MultiSelect->merge(array('1','2','3'));
 		$result = $this->MultiSelect->_get();
 		$this->assertEqual($expected, $result);
+
+		$result = $this->MultiSelect->_get('NonExistentKey');
+		$expected = array();
+		$this->assertIdentical($result, $expected);
 	}
 
 	function test_save() {
