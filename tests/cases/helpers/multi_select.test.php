@@ -31,14 +31,14 @@ class TheMultiSelectTestController extends Controller {
 
 /**
  * No model
- * 
+ *
  * @var string
  */
 	var $uses = null;
 
 /**
  * Components
- * 
+ *
  * @var array
  * @access public
  */
@@ -64,7 +64,7 @@ class MultiSelectTest extends CakeTestCase {
 		$this->Controller->MultiSelect->initialize($this->Controller);
 		$this->Controller->MultiSelect->startup();
 		$this->View =& new View($this->Controller);
-		
+
 		$this->MultiSelect =& new MultiSelectHelper();
 		$this->MultiSelect->Session =& new SessionHelper();
 		$this->MultiSelect->Form =& new FormHelper();
@@ -91,7 +91,7 @@ class MultiSelectTest extends CakeTestCase {
 		));
 		$this->MultiSelect->create();
 		$this->assertNoErrors();
-		
+
 		$this->MultiSelect->params['named']['mstoken'] = 'test';
 		$this->Session->write('MultiSelect', array(
 			'test' => array(
@@ -102,21 +102,21 @@ class MultiSelectTest extends CakeTestCase {
 			)
 		));
 		$this->MultiSelect->create();
-		
+
 		$results = $this->MultiSelect->selected;
 		$expected = array(1, 2, 3);
 		$this->assertEqual($results, $expected);
-		
+
 		$results = $this->MultiSelect->all;
 		$this->assertTrue($results);
 	}
-	
+
 	function testCheckedAllBox() {
 		$uidReg = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
-		
+
 		$this->MultiSelect->selected = array();
 		$this->MultiSelect->all = true;
-		
+
 		$result = $this->MultiSelect->checkbox('all');
 		$expected = array(
 			'input' => array(
@@ -130,7 +130,7 @@ class MultiSelectTest extends CakeTestCase {
 			)
 		);
 		$this->assertTags($result, $expected);
-		
+
 		$result = $this->MultiSelect->checkbox(1);
 		$expected = array(
 			'input' => array(
@@ -145,7 +145,7 @@ class MultiSelectTest extends CakeTestCase {
 		);
 		$this->assertTags($result, $expected);
 	}
-	
+
 	function testCheckbox() {
 		$this->MultiSelect->selected = array(1);
 		$uidReg = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
@@ -242,7 +242,7 @@ class MultiSelectTest extends CakeTestCase {
 		);
 		$this->assertTags($result, $expected);
 
-		
+
 		$result = $this->MultiSelect->checkbox(1);
 		$expected = array(
 			'input' => array(
@@ -261,12 +261,12 @@ class MultiSelectTest extends CakeTestCase {
 	function testEnd() {
 		$uidReg = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
 		$selector = '\"\.multi-select-box\[data-multiselect-token=[a-z0-9]+\]\"';
-		
+
 		$this->MultiSelect->end();
 		$buffer = $this->MultiSelect->Js->getBuffer();
 		$this->assertPattern('/\$\('.$selector.'\)\.bind/', $buffer[0]);
 		$this->assertPattern('/\.ajax/', $buffer[0]);
-		
+
 		$this->MultiSelect->Js =& new JsHelper(array('Prototype'));
 		$this->MultiSelect->Js->PrototypeEngine =& new PrototypeEngineHelper();
 		$this->MultiSelect->end();

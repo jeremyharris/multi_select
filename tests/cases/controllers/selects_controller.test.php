@@ -18,24 +18,24 @@ Mock::generatePartial('RequestHandlerComponent', 'MockRequestHandlerComponent', 
 
 class TestSelectsController extends SelectsController {
 	var $autoRender = false;
-	
+
 	var $components = array(
 		'MultiSelect.MultiSelect' => array(
 			'usePages' => true
 		)
 	);
-	
+
 	function redirect($url, $status = null, $exit = true) {
 		$this->redirectUrl = $url;
 	}
-	
+
 	function cakeError($type = '') {
 		$this->cakeError = $type;
 	}
 }
 
 class SelectsControllerTestCase extends CakeTestCase {
-	
+
 	function startTest() {
 		$this->Selects =& new TestSelectsController();
 		$this->Selects->constructClasses();
@@ -48,28 +48,28 @@ class SelectsControllerTestCase extends CakeTestCase {
 		unset($this->Selects);
 		ClassRegistry::flush();
 	}
-	
+
 	function _reset() {
 		$this->Selects->params['url'] = $this->viewVars = array();
 		$this->redirectUrl = $this->cakeError = null;
 		$this->Selects->MultiSelect->startup();
 	}
-	
+
 	function testSession() {
 		// invalid request
 		$this->_reset();
 		$this->Selects->session();
 		$this->assertTrue(empty($this->Selects->viewVars['data']));
 		$this->assertEqual($this->Selects->cakeError, 'error404');
-		
+
 		$this->Selects->RequestHandler->setReturnValue('isAjax', true);
-		
+
 		// invalid request
 		$this->_reset();
 		$this->Selects->session();
 		$this->assertTrue(empty($this->Selects->viewVars['data']));
 		$this->assertEqual($this->Selects->cakeError, 'error404');
-		
+
 		// add a single value
 		$this->_reset();
 		$this->Selects->params['url'] = array(
@@ -79,7 +79,7 @@ class SelectsControllerTestCase extends CakeTestCase {
 		$this->Selects->session();
 		sort($this->Selects->viewVars['data']);
 		$this->assertEqual($this->Selects->viewVars['data'], array(1));
-		
+
 		// add a single value
 		$this->_reset();
 		$this->Selects->params['url'] = array(
@@ -89,7 +89,7 @@ class SelectsControllerTestCase extends CakeTestCase {
 		$this->Selects->session();
 		sort($this->Selects->viewVars['data']);
 		$this->assertEqual($this->Selects->viewVars['data'], array(1, 2));
-		
+
 		// remove a single value
 		$this->_reset();
 		$this->Selects->params['url'] = array(
@@ -99,7 +99,7 @@ class SelectsControllerTestCase extends CakeTestCase {
 		$this->Selects->session();
 		sort($this->Selects->viewVars['data']);
 		$this->assertEqual($this->Selects->viewVars['data'], array(2));
-		
+
 		$this->Selects->Session->write('MultiSelect.'.$this->Selects->MultiSelect->_token.'.page', array(1,2,3,4,5));
 		// add all of current page
 		$this->_reset();
@@ -110,7 +110,7 @@ class SelectsControllerTestCase extends CakeTestCase {
 		$this->Selects->session();
 		sort($this->Selects->viewVars['data']);
 		$this->assertEqual($this->Selects->viewVars['data'], array(1,2,3,4,5));
-		
+
 		// add another
 		$this->_reset();
 		$this->Selects->params['url'] = array(
@@ -120,7 +120,7 @@ class SelectsControllerTestCase extends CakeTestCase {
 		$this->Selects->session();
 		sort($this->Selects->viewVars['data']);
 		$this->assertEqual($this->Selects->viewVars['data'], array(1,2,3,4,5,6));
-		
+
 		// remove page
 		$this->_reset();
 		$this->Selects->params['url'] = array(
@@ -131,5 +131,5 @@ class SelectsControllerTestCase extends CakeTestCase {
 		sort($this->Selects->viewVars['data']);
 		$this->assertEqual($this->Selects->viewVars['data'], array(6));
 	}
-	
+
 }

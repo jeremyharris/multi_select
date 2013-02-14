@@ -26,14 +26,14 @@ class MultiSelectHelper extends AppHelper {
  * Additional helpers
  *
  * @var array
- */ 
+ */
 	var $helpers = array('Session', 'Form', 'Js');
 
 /**
  * Ids that should be selected (set automatically by MultiSelectComponent)
  *
  * @var array
- */ 	
+ */
 	var $selected = array();
 
 /**
@@ -61,15 +61,15 @@ class MultiSelectHelper extends AppHelper {
  * Initializes the Helper
  *
  * @access public
- */ 
+ */
 	function create() {
 		// check for session key
 		if (!isset($this->params['named']['mstoken']) || !$this->Session->check('MultiSelect')) {
 			trigger_error('MultiSelectHelper::create() :: Missing MultiSelect key in session or MultiSelect token. Make sure to include the MultiSelectComponent in your controller file.', E_USER_WARNING);
 		}
-		
+
 		$this->token = $this->params['named']['mstoken'];
-		
+
 		$this->all = $this->Session->read('MultiSelect.'.$this->token.'.all');
 
 		// get cache and store
@@ -83,25 +83,25 @@ class MultiSelectHelper extends AppHelper {
  * @param array $options Array of options to merge with the checkbox
  * @return null|string The generated checkbox widget
  * @access public
- */ 
+ */
 	function checkbox($value = '', $options = array()) {
 		$uid = String::uuid();
-		
+
 		$defaultOptions = array(
 			'hiddenField' => false,
 			'class' => '',
 			'data-multiselect-token' => $this->token
 		);
-		
+
 		$options = array_merge($defaultOptions, $options);
 		$options['id'] = $uid;
 		$options['value'] = $value;
 		$options['class'] .= ' multi-select-box';
-		
+
 		if (in_array($value, $this->selected)) {
 			$options['checked'] = 'checked';
 		}
-		
+
 		if ($value !== 'all') {
 			$this->page[] = $value;
 			if ($this->all) {
@@ -112,14 +112,14 @@ class MultiSelectHelper extends AppHelper {
 				$options['checked'] = 'checked';
 			}
 		}
-		
+
 
 		$output = $this->Form->checkbox('', $options);
-		
+
 
 		return $output;
 	}
-	
+
 /**
  * Buffers JavaScript to tie it all together
  *
@@ -129,9 +129,9 @@ class MultiSelectHelper extends AppHelper {
 		App::import('Component', 'Session');
 		$Session = new SessionComponent();
 		$Session->write('MultiSelect.'.$this->token.'.page', $this->page);
-		
+
 		$usePages = $Session->read('MultiSelect.'.$this->token.'.usePages');
-		
+
 		$url = Router::url(array(
 			'controller' => 'selects',
 			'action' => 'session',
@@ -139,7 +139,7 @@ class MultiSelectHelper extends AppHelper {
 			'mstoken' => $this->token,
 			'ext' => 'json'
 		));
-		
+
 		$this->Js->get(".multi-select-box[data-multiselect-token=$this->token]");
 		$each = <<<JS
 this.disabled = false;

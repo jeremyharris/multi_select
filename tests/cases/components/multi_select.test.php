@@ -62,7 +62,7 @@ Mock::generatePartial('RequestHandlerComponent', 'MockMultiSelectComponentReques
  * @subpackage    multi_select.tests.cases.components
  */
 class MultiSelectComponentTest extends CakeTestCase {
-	
+
 	function startCase() {
 		$this->Controller =& new MultiSelectComponentTestController(array('components' => array('RequestHandler')));
 		$this->Controller->constructClasses();
@@ -81,7 +81,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->MultiSelect->RequestHandler->initialize($this->Controller);
 		$this->MultiSelect->startup();
 	}
-	
+
 	function testPostPersist() {
 		$this->MultiSelect->RequestHandler->setReturnValue('isPost', true);
 		$this->Controller->params['named']['mspersist'] = 1;
@@ -92,7 +92,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$expected = array(1);
 		$this->assertEqual($result, $expected);
 	}
-	
+
 	function testNewSessionOnPost() {
 		$this->MultiSelect->RequestHandler->setReturnValueAt(0, 'isPost', false);
 		$this->Controller->params['named']['mstoken'] = $this->MultiSelect->_token;
@@ -108,20 +108,20 @@ class MultiSelectComponentTest extends CakeTestCase {
 			'all' => false
 		);
 		$this->assertEqual($result, $expected);
-		
+
 		$this->MultiSelect->RequestHandler->setReturnValueAt(1, 'isPost', false);
 		$this->MultiSelect->startup();
 		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected');
 		$expected = array(1);
 		$this->assertEqual($result, $expected);
-		
+
 		$this->MultiSelect->RequestHandler->setReturnValueAt(2, 'isPost', true);
 		$this->MultiSelect->startup();
 		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected');
 		$expected = array();
 		$this->assertEqual($result, $expected);
 	}
-	
+
 	function testExpiration() {
 		$tokens = array(
 			'test1' => array(
@@ -145,7 +145,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		);
 		$this->MultiSelect->Session->write('MultiSelect', $tokens);
 		$this->MultiSelect->startup();
-		
+
 		$results = $this->MultiSelect->Session->read('MultiSelect');
 		$expected = array(
 			'test2' => array(
@@ -178,7 +178,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 			'created' => $now
 		);
 		$this->assertEqual($result, $expected);
-		
+
 		$this->Controller->params['named']['mstoken'] = $this->MultiSelect->_token;
 		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.page', array(1));
 		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.usePages', true);
@@ -193,7 +193,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 			'created' => $now
 		);
 		$this->assertEqual($result, $expected);
-		
+
 		$this->assertTrue($this->MultiSelect->usePages);
 	}
 
@@ -295,7 +295,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$expected = array('1','2','3','4');
 		$result = $this->MultiSelect->delete(array());
 		$this->assertEqual($expected, $result);
-		
+
 		$expected = array('2','3','4');
 		$result = $this->MultiSelect->delete(array('1'));
 		$this->assertEqual($expected, $result);
@@ -312,11 +312,11 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$expected = array('1','2','3','4','5','6');
 		$result = $this->MultiSelect->selectAll();
 		$this->assertEqual($result, $expected);
-		
+
 		$this->MultiSelect->usePages = false;
 		$result = $this->MultiSelect->selectAll();
 		$this->assertTrue($result);
-		
+
 		$results = $this->MultiSelect->getSelected();
 		$expected = 'all';
 		$this->assertEqual($results, $expected);
@@ -329,11 +329,11 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$expected = array('1','2','3');
 		$result = $this->MultiSelect->deselectAll();
 		$this->assertEqual($result, $expected);
-		
+
 		$this->MultiSelect->usePages = false;
 		$result = $this->MultiSelect->deselectAll();
 		$this->assertTrue($result);
-		
+
 		$results = $this->MultiSelect->getSelected();
 		$expected = array();
 		$this->assertEqual($results, $expected);

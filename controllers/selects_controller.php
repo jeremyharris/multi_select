@@ -32,7 +32,7 @@ class SelectsController extends MultiSelectAppController {
 
 /**
  * Components used by this controller
- * 
+ *
  * @var array
  */
 	var $components = array(
@@ -54,9 +54,9 @@ class SelectsController extends MultiSelectAppController {
 			$this->cakeError('error404');
 			return;
 		}
-		
+
 		$this->params['url'] += array('value' => null, 'selected' => null);
-		
+
 		if ($this->params['url']['value'] == null || $this->params['url']['selected'] == null) {
 			$data = array();
 		} else {
