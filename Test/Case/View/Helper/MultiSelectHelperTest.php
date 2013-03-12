@@ -31,14 +31,14 @@ class TheMultiSelectTestController extends Controller {
 
 /**
  * No model
- * 
+ *
  * @var string
  */
 	var $uses = null;
 
 /**
  * Components
- * 
+ *
  * @var array
  * @access public
  */
@@ -64,7 +64,7 @@ class MultiSelectTest extends CakeTestCase {
 		$this->Controller->MultiSelect->initialize($this->Controller);
 		$this->Controller->MultiSelect->startup();
 		$this->View =& new View($this->Controller);
-		
+
 		$this->MultiSelect =& new MultiSelectHelper();
 		$this->MultiSelect->Session =& new SessionHelper();
 		$this->MultiSelect->Form =& new FormHelper();
@@ -182,7 +182,7 @@ class MultiSelectTest extends CakeTestCase {
 		);
 		$this->assertTags($result, $expected);
 
-		
+
 		$result = $this->MultiSelect->checkbox(1);
 		$expected = array(
 			'input' => array(
@@ -208,7 +208,7 @@ class MultiSelectTest extends CakeTestCase {
 		$buffer = $this->MultiSelect->Js->getBuffer();
 		$this->assertPattern('/\$\("\.multi-select-box"\)\.bind/', $buffer[0]);
 		$this->assertPattern('/\.ajax/', $buffer[0]);
-		
+
 		$this->MultiSelect->Js =& new JsHelper(array('Prototype'));
 		$this->MultiSelect->Js->PrototypeEngine =& new PrototypeEngineHelper();
 		$this->MultiSelect->end();

@@ -24,7 +24,7 @@ For example, to apply a "delete" action on a simple list of users:
 
 ### View
 
-In order for the MultiSelect to work, you need to wrap your table in the 
+In order for the MultiSelect to work, you need to wrap your table in the
 `create()` and `end()` methods and use its `checkbox()` method to create
 checkboxes.
 
@@ -46,7 +46,7 @@ function that works with the MultiSelectComponent.
 
     var $components = array('MultiSelect.MultiSelect');
     var $helpers = array('MultiSelect.MultiSelect');
-    
+
     function delete() {
         $selected = $this->MultiSelect->getSelected();
         // $selected is an array of ids that were checked
@@ -60,7 +60,7 @@ function that works with the MultiSelectComponent.
 
 The MultiSelect plugin uses tokens to handle multiple sets of MultiSelect data
 being saved at once (i.e., having two browser tabs open and MultiSelecting both
-tables). To handle this in your links and controllers, you'll have to pass a 
+tables). To handle this in your links and controllers, you'll have to pass a
 named parameter `mstoken`.
 
     // pass the current token to the controller action

@@ -60,7 +60,7 @@ class MultiSelectComponentTestController extends Controller {
  * @subpackage    multi_select.tests.cases.components
  */
 class MultiSelectComponentTest extends CakeTestCase {
-	
+
 	function startCase() {
 		$this->Controller =& new MultiSelectComponentTestController(array('components' => array('RequestHandler')));
 		$this->Controller->constructClasses();
@@ -198,7 +198,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$expected = array('1','2','3','4');
 		$result = $this->MultiSelect->delete(array());
 		$this->assertEqual($expected, $result);
-		
+
 		$expected = array('2','3','4');
 		$result = $this->MultiSelect->delete(array('1'));
 		$this->assertEqual($expected, $result);

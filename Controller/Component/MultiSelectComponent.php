@@ -31,7 +31,7 @@ class MultiSelectComponent extends Object {
  *
  * @var object
  * @access public
- */ 
+ */
 	var $controller = null;
 
 /**
@@ -39,7 +39,7 @@ class MultiSelectComponent extends Object {
  *
  * @var array
  * @access public
- */ 
+ */
 	var $components = array('Session');
 
 /**
@@ -57,7 +57,7 @@ class MultiSelectComponent extends Object {
  * @access public
  */
 	function initialize(&$controller) {
-		$this->controller =& $controller;		
+		$this->controller =& $controller;
 	}
 
 /**
@@ -65,12 +65,12 @@ class MultiSelectComponent extends Object {
  *
  * @access public
  * @todo check for pagination in url instead of layout
- */	
+ */
 	function startup() {
 		if (!isset($this->controller->params['named'])) {
 			$this->controller->params['named'] = array();
 		}
-		
+
 		if ($this->check()) {
 			$currentTokens = $this->Session->read('MultiSelect');
 			foreach ($currentTokens as $token => $values) {
@@ -100,7 +100,7 @@ class MultiSelectComponent extends Object {
  * @param array $search The search data
  * @return boolean Save success
  * @access public
- */	
+ */
 	function saveSearch($search = array()) {
 		if (!is_array($search)) {
 			return false;
@@ -116,7 +116,7 @@ class MultiSelectComponent extends Object {
  * @param string $uid The token to get, or null for current
  * @return array Search data that was previously saved
  * @access public
- */	
+ */
 	function getSearch($uid = null) {
 		if (!$uid) {
 			$uid = $this->_token;
@@ -130,7 +130,7 @@ class MultiSelectComponent extends Object {
  * @param string $uid The token to get, or null for current
  * @return mixed Array of ids, or `all`
  * @access public
- */		
+ */
 	function getSelected($uid = null) {
 		if (!$uid) {
 			$uid = $this->_token;
@@ -144,7 +144,7 @@ class MultiSelectComponent extends Object {
  * @param $uid The id to check, if any
  * @return boolean Exists?
  * @access public
- */		
+ */
 	function check($uid = null) {
 		if (!$uid) {
 			return $this->Session->check('MultiSelect');
@@ -159,7 +159,7 @@ class MultiSelectComponent extends Object {
  * @param array $data Array of ids
  * @return array New data
  * @access public
- */		
+ */
 	function merge($data = array()) {
 		$cache = array_values(array_unique(array_merge($this->_get(), $data)));
 		$this->_save($cache);
@@ -172,8 +172,8 @@ class MultiSelectComponent extends Object {
  * @param array $data Array of ids
  * @return array New data
  * @access public
- */			
-	function delete($data = array()) {		
+ */
+	function delete($data = array()) {
 		$cache = array_values(array_diff($this->_get(), $data));
 		$this->_save($cache);
 		return $cache;
@@ -184,7 +184,7 @@ class MultiSelectComponent extends Object {
  *
  * @return boolean Set success
  * @access public
- */			
+ */
 	function selectAll() {
 		return $this->merge($this->Session->read('MultiSelect.'.$this->_token.'.page'));
 	}
@@ -194,7 +194,7 @@ class MultiSelectComponent extends Object {
  *
  * @return boolean Reset success
  * @access public
- */		
+ */
 	function deselectAll() {
 		return $this->delete($this->Session->read('MultiSelect.'.$this->_token.'.page'));
 	}
@@ -205,7 +205,7 @@ class MultiSelectComponent extends Object {
  * @param array $data Array of ids
  * @return boolean Write success
  * @access private
- */	
+ */
 	function _save($data = array()) {
 		return $this->Session->write('MultiSelect.'.$this->_token.'.selected', $data);
 	}
@@ -215,11 +215,11 @@ class MultiSelectComponent extends Object {
  *
  * @return array Array of ids
  * @access private
- */		
+ */
 	function _get($uid = null) {
 		if (!$uid) {
 			$uid = $this->_token;
 		}
 		return $this->Session->read('MultiSelect.'.$this->_token.'.selected');
-	}	
+	}
 }
