@@ -24,7 +24,7 @@
  * @package       multi_select
  * @subpackage    multi_select.controllers.components
  */
-class MultiSelectComponent extends Object {
+class MultiSelectComponent extends Component {
 
 /**
  * A stored reference to the calling controller

@@ -55,17 +55,17 @@ class SelectsController extends MultiSelectAppController {
 			return;
 		}
 
-		$this->params['url'] += array('value' => null, 'selected' => null);
+		$this->request->params['url'] += array('value' => null, 'selected' => null);
 
-		if ($this->params['url']['value'] == null || $this->params['url']['selected'] == null) {
+		if ($this->request->params['url']['value'] == null || $this->request->params['url']['selected'] == null) {
 			$data = array();
 		} else {
-			if ($this->params['url']['value'] == 'all') {
-				$action = $this->params['url']['selected'] == 'true' ? 'selectAll' : 'deselectAll';
+			if ($this->request->params['url']['value'] == 'all') {
+				$action = $this->request->params['url']['selected'] == 'true' ? 'selectAll' : 'deselectAll';
 			} else {
-				$action = $this->params['url']['selected'] == 'true' ? 'merge' : 'delete';
+				$action = $this->request->params['url']['selected'] == 'true' ? 'merge' : 'delete';
 			}
-			$data = $this->MultiSelect->{$action}(array($this->params['url']['value']));
+			$data = $this->MultiSelect->{$action}(array($this->request->params['url']['value']));
 		}
 
 		$this->set('data', $data);

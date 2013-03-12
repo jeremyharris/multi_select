@@ -57,11 +57,11 @@ class MultiSelectHelper extends AppHelper {
  */
 	function create() {
 		// check for session key
-		if (!isset($this->params['named']['mstoken']) || !$this->Session->check('MultiSelect')) {
+		if (!isset($this->request->params['named']['mstoken']) || !$this->Session->check('MultiSelect')) {
 			trigger_error('MultiSelectHelper::create() :: Missing MultiSelect key in session or MultiSelect token. Make sure to include the MultiSelectComponent in your controller file.', E_USER_WARNING);
 		}
 
-		$this->token = $this->params['named']['mstoken'];
+		$this->token = $this->request->params['named']['mstoken'];
 
 		// get cache and store
 		$this->selected = $this->Session->read('MultiSelect.'.$this->token.'.selected');
