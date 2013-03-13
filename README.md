@@ -35,8 +35,9 @@ checkboxes.
     echo $this->MultiSelect->end();
 
 The helper also comes with 'check all' functionality. Simply pass 'all' to
-`MultiSelectHelper::checkbox()`'s value. When you click it, the entire page is
-selected.
+`MultiSelectHelper::checkbox()`'s value. The function of the 'check all' box
+depends on if you have the `$usePages` option set on the component (see more
+info below).
 
 ### Controller
 
@@ -71,6 +72,60 @@ And then in your controller
     function delete() {
         $selected = $this->MultiSelect->getSelected();
         // do stuff
+    }
+
+#### Persisting across `POST` requests
+
+MultiSelect considers `POST` requests to be new requests and therefore resets.
+This is useful for filter forms. Sometimes, however, you may want a `POST` action
+to take advantage of the selected items, such as a bulk edit function. To persist
+the MultiSelect session, pass the `mspersist:1` named parameter to your action.
+
+    $this->Html->link('Bulk Edit', array(
+      'action' => 'edit',
+      'mstoken' => $this->MultiSelect->token
+    ));
+
+In your edit form, include the named parameter:
+
+    $this->Form->create(array(
+      'url' => array(
+        'mspersist' => 1
+      )
+    ));
+    echo $this->Form->input('status');
+    echo $this->Form->end('Submit');
+
+When the form is submitted, MultiSelect will use the current session rather than
+starting a new, empty one.
+
+### Component options
+
+#### `usePages`
+
+The `$usePages` option on the component dictates the behavior of the 'check all'
+box.
+
+When `$usePages` is `true`, the check all box will treat "all" as "everything
+on that page". When you click it, the entire page is added to the selected items.
+
+When `$usePages` is `false`, the check all box mark that everything should be
+selected. Then you'll need to check for this case in your controller.
+
+    function delete() {
+        $selected = $this->MultiSelect->getSelected();
+        if ($selected === 'all') {
+            // find all from a saved search
+            $search = $this->MultiSelect->getSearch();
+            $results = $this->User->find('all', $search);
+            $selected = Set::extract('/User/id', $results);
+        }
+        foreach ($selected as $deleteMe) {
+            $this->User->delete($deleteMe);
+        }
+
+        $this->Session->setFlash(count($selected).' Users deleted.');
+        $this->redirect(array('action' => 'index'));
     }
 
 ## Future

@@ -45,7 +45,10 @@ class MultiSelectComponent extends Component {
  * @var array
  * @access public
  */
-	var $components = array('Session');
+	var $components = array(
+		'Session',
+		'RequestHandler'
+	);
 
 /**
  * Current token
@@ -56,13 +59,22 @@ class MultiSelectComponent extends Component {
 	var $_token = null;
 
 /**
+ * Changes the behavior of the 'check all' box.
+ *
+ * @var boolean
+ * @see README
+ */
+	var $usePages = false;
+
+/**
  * Start MultiSelectComponent for use in the controller
  *
  * @param object $controller A reference to the controller
  * @access public
  */
-	function initialize(&$controller) {
+	function initialize(&$controller,  $settings = array()) {
 		$this->controller =& $controller;
+		$this->_set($settings);
 	}
 
 /**
@@ -76,26 +88,32 @@ class MultiSelectComponent extends Component {
 			$this->controller->params['named'] = array();
 		}
 
-		if ($this->check()) {
+		if ($this->Session->check('MultiSelect')) {
 			$currentTokens = $this->Session->read('MultiSelect');
+			$expires = strtotime('-10 minutes');
 			foreach ($currentTokens as $token => $values) {
-				if (isset($values['created']) && $values['created'] > strtotime('+10 minutes')) {
+				if (isset($values['created']) && $values['created'] < $expires) {
 					$this->Session->delete('MultiSelect.'.$token);
 				}
 			}
 		}
 
-		if (!isset($this->controller->params['named']['mstoken'])) {
-			$this->_token = String::uuid();
+		$newRequest = !isset($this->controller->params['named']['mstoken']) || $this->RequestHandler->isPost();
+
+		if ($newRequest && !isset($this->controller->params['named']['mspersist'])) {
+			$this->_token = uniqid();
 			$this->controller->params['named']['mstoken'] = $this->_token;
 			$success = $this->Session->write('MultiSelect.'.$this->_token, array(
 				'selected' => array(),
 				'search' => array(),
 				'page' => array(),
-				'created' => time()
+				'usePages' => $this->usePages,
+				'created' => time(),
+				'all' => false
 			));
 		} else {
 			$this->_token = $this->controller->params['named']['mstoken'];
+			$this->usePages = $this->Session->read('MultiSelect.'.$this->_token.'.usePages');
 		}
 	}
 
@@ -140,7 +158,11 @@ class MultiSelectComponent extends Component {
 		if (!$uid) {
 			$uid = $this->_token;
 		}
-		return $this->Session->read('MultiSelect.'.$uid.'.selected');
+		if ($this->Session->read('MultiSelect.'.$uid.'.all')) {
+			return 'all';
+		} else {
+			return $this->Session->read('MultiSelect.'.$uid.'.selected');
+		}
 	}
 
 /**
@@ -152,10 +174,9 @@ class MultiSelectComponent extends Component {
  */
 	function check($uid = null) {
 		if (!$uid) {
-			return $this->Session->check('MultiSelect');
-		} else {
-			return $this->Session->check('MultiSelect.'.$uid);
+			$uid = $this->_token;
 		}
+		return $this->Session->check('MultiSelect.'.$uid);
 	}
 
 /**
@@ -191,7 +212,12 @@ class MultiSelectComponent extends Component {
  * @access public
  */
 	function selectAll() {
-		return $this->merge($this->Session->read('MultiSelect.'.$this->_token.'.page'));
+		if ($this->usePages) {
+			return $this->merge($this->Session->read('MultiSelect.'.$this->_token.'.page'));
+		} else {
+			$this->_save(array());
+			return $this->Session->write('MultiSelect.'.$this->_token.'.all', true);
+		}
 	}
 
 /**
@@ -201,7 +227,12 @@ class MultiSelectComponent extends Component {
  * @access public
  */
 	function deselectAll() {
-		return $this->delete($this->Session->read('MultiSelect.'.$this->_token.'.page'));
+		if ($this->usePages) {
+			return $this->delete($this->Session->read('MultiSelect.'.$this->_token.'.page'));
+		} else {
+			$this->_save(array());
+			return $this->Session->write('MultiSelect.'.$this->_token.'.all', false);
+		}
 	}
 
 /**
@@ -225,6 +256,6 @@ class MultiSelectComponent extends Component {
 		if (!$uid) {
 			$uid = $this->_token;
 		}
-		return $this->Session->read('MultiSelect.'.$this->_token.'.selected');
+		return (array)$this->Session->read('MultiSelect.'.$uid.'.selected');
 	}
 }

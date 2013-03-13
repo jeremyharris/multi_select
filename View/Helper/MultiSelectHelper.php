@@ -46,6 +46,13 @@ class MultiSelectHelper extends AppHelper {
 	var $page = array();
 
 /**
+ * Is "check all" active?
+ *
+ * @var string
+ */
+	var $all = false;
+
+/**
  * The token
  *
  * @var string
@@ -64,6 +71,8 @@ class MultiSelectHelper extends AppHelper {
 		}
 
 		$this->token = $this->request->params['named']['mstoken'];
+
+		$this->all = $this->Session->read('MultiSelect.'.$this->token.'.all');
 
 		// get cache and store
 		$this->selected = $this->Session->read('MultiSelect.'.$this->token.'.selected');
@@ -95,11 +104,18 @@ class MultiSelectHelper extends AppHelper {
 			$options['checked'] = 'checked';
 		}
 
-		$output = $this->Form->checkbox('', $options);
-
 		if ($value !== 'all') {
 			$this->page[] = $value;
+			if ($this->all) {
+				$options['disabled'] = true;
+			}
+		} else {
+			if ($this->all) {
+				$options['checked'] = 'checked';
+			}
 		}
+
+		$output = $this->Form->checkbox('', $options);
 
 		return $output;
 	}
@@ -114,6 +130,8 @@ class MultiSelectHelper extends AppHelper {
 		$Session = new SessionComponent();
 		$Session->write('MultiSelect.'.$this->token.'.page', $this->page);
 
+		$usePages = $Session->read('MultiSelect.'.$this->token.'.usePages');
+
 		$url = Router::url(array(
 			'controller' => 'selects',
 			'action' => 'session',
@@ -124,9 +142,24 @@ class MultiSelectHelper extends AppHelper {
 
 		$this->Js->get(".multi-select-box[data-multiselect-token=$this->token]");
 		$each = <<<JS
-checked ? this.setAttribute('checked', 'checked') : this.removeAttribute('checked');
+this.disabled = false;
+if (autoCheck) {
+	this.setAttribute('checked', 'checked');
+	this.checked = true;
+} else {
+	this.removeAttribute('checked');
+	this.checked = false;
+}
+if (this.value !== 'all' && shouldDisable) {
+	if (autoCheck) {
+		this.checked = false;
+		this.disabled = true;
+	} else {
+		this.disabled = false;
+	}
+}
 if (document.createEventObject){
-	this.fireEvent('onchange', document.createEventObject())
+	this.fireEvent('onchange', document.createEventObject());
 } else {
 	var evt = document.createEvent("HTMLEvents")
 	evt.initEvent('change', true, true);
@@ -134,13 +167,20 @@ if (document.createEventObject){
 };
 JS;
 		$each = $this->Js->each($each, array('buffer' => false));
-		$clickall = " if (this.value == 'all') {var checked = this.checked; $each}";
+		$disable = $usePages ? 'false' : 'true';
+		$click = <<<JS
+if (this.value === 'all') {
+	var autoCheck = this.checked;
+	var shouldDisable = $disable;
+	$each
+}
+JS;
 		$request = $this->Js->request($url, array(
 			'dataExpression' => true,
 			'data' => '{value:this.value,selected:this.checked}',
 			'method' => 'get',
 			'dataType' => 'json'
 		));
-		$this->Js->event('click', $request.$clickall, array('stop' => false));
+		$this->Js->event('click', $request.$click, array('stop' => false));
 	}
 }
