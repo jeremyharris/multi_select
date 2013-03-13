@@ -9,6 +9,11 @@
  */
 
 /**
+ * Includes
+ */
+App::uses('Component', 'Controller');
+
+/**
  * MultiSelect Component
  *
  * Allows for storing multiple ids of a search to return later.

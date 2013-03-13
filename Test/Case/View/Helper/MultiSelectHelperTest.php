@@ -11,7 +11,10 @@
 /**
  * Includes
  */
-App::import('Helper', array('Js', 'Form', 'Html', 'Session', 'MultiSelect.MultiSelect', 'JqueryEngine', 'PrototypeEngine'));
+App::uses('MultiSelectHelper', 'MultiSelect.View/Helper');
+App::uses('SelectsController', 'MultiSelect.Controller');
+App::uses('CakeRequest', 'Network');
+App::uses('CakeResponse', 'Network');
 
 /**
  * TheMultiSelectTestController class

@@ -11,8 +11,8 @@
 /**
  * Includes
  */
-App::import('Controller', array('MultiSelect.Selects'));
-App::import('Component', array('RequestHandler'));
+App::uses('SelectsController', 'MultiSelect.Controller');
+App::uses('RequestHandlerComponent', 'Controller/Component');
 
 Mock::generatePartial('RequestHandlerComponent', 'MockRequestHandlerComponent', array('isAjax'));
 

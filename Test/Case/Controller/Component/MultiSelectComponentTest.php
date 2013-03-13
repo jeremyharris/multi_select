@@ -11,8 +11,12 @@
 /**
  * Includes
  */
-App::import('Core', 'Component');
-App::import('Component', array('Session', 'MultiSelect.MultiSelect', 'RequestHandler'));
+App::uses('SelectsController', 'MultiSelect.Controller');
+App::uses('MultiSelectComponent', 'MultiSelect.Controller/Component');
+App::uses('SessionComponent', 'Controller/Component');
+App::uses('RequestHandlerComponent', 'Controller/Component');
+App::uses('CakeRequest', 'Network');
+App::uses('CakeResponse', 'Network');
 
 /**
  * MultiSelectComponentTestController class

@@ -9,6 +9,11 @@
  */
 
 /**
+ * Includes
+ */
+App::uses('MultiSelectAppController', 'MultiSelect.Controller');
+
+/**
  * Selects Controller
  *
  * @package       multi_select

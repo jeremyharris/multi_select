@@ -8,6 +8,8 @@
  * @subpackage    multi_select.views.helpers
  */
 
+App::uses('AppHelper', 'View/Helper');
+
 /**
  * MultiSelect Helper
  *
