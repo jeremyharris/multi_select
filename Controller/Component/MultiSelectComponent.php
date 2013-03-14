@@ -67,17 +67,6 @@ class MultiSelectComponent extends Component {
 	var $usePages = false;
 
 /**
- * Start MultiSelectComponent for use in the controller
- *
- * @param object $controller A reference to the controller
- * @access public
- */
-	function initialize($controller,  $settings = array()) {
-		$controller = $controller;
-		$this->_set($settings);
-	}
-
-/**
  * Creates session keys and removes expired ones
  *
  * @access public
