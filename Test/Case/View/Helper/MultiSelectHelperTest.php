@@ -13,6 +13,7 @@
  */
 App::uses('MultiSelectHelper', 'MultiSelect.View/Helper');
 App::uses('SelectsController', 'MultiSelect.Controller');
+App::uses('PrototypeEngineHelper', 'View/Helper');
 App::uses('CakeRequest', 'Network');
 App::uses('CakeResponse', 'Network');
 
@@ -22,7 +23,7 @@ App::uses('CakeResponse', 'Network');
  * @package       multi_select
  * @subpackage    multi_select.tests.cases.helpers
  */
-class TheMultiSelectTestController extends Controller {
+class TheMultiSelectTestController extends SelectsController {
 
 /**
  * Name
@@ -60,34 +61,28 @@ class TheMultiSelectTestController extends Controller {
  */
 class MultiSelectTest extends CakeTestCase {
 
-	function startCase() {
-		$this->Controller =& new TheMultiSelectTestController();
+	function setUp() {
+		$request = new CakeRequest('selects/index');
+		$response = new CakeResponse();
+		$this->Controller = new SelectsController($request, $response);
 		$this->Controller->constructClasses();
-		$this->Controller->RequestHandler->initialize($this->Controller);
-		$this->Controller->MultiSelect->initialize($this->Controller);
-		$this->Controller->MultiSelect->startup();
-		$this->View =& new View($this->Controller);
-
-		$this->MultiSelect =& new MultiSelectHelper();
-		$this->MultiSelect->Session =& new SessionHelper();
-		$this->MultiSelect->Form =& new FormHelper();
-		$this->MultiSelect->Form->Html =& new HtmlHelper();
-		$this->MultiSelect->Js =& new JsHelper(array('Jquery'));
-		$this->MultiSelect->Js->JqueryEngine =& new JqueryEngineHelper();
-		$this->Session =& new SessionComponent();
+		$this->Controller->Components->trigger('startup', array($this->Controller));
+		$this->View = new View($this->Controller);
+		$this->MultiSelect = new MultiSelectHelper($this->View);
 	}
 
 	function startTest() {
-		$this->MultiSelect->params['named']['mstoken'] = $this->Controller->MultiSelect->_token;
+		$this->MultiSelect->request->params['named']['mstoken'] = $this->Controller->MultiSelect->_token;
 		$this->MultiSelect->create();
 	}
 
 	function testCreate() {
-		$this->Session->delete('MultiSelect');
-		$this->MultiSelect->create();
-		$this->assertError('MultiSelectHelper::create() :: Missing MultiSelect key in session or MultiSelect token. Make sure to include the MultiSelectComponent in your controller file.');
+		$this->Controller->Session->delete('MultiSelect');
 
-		$this->Session->write('MultiSelect', array(
+		$this->expectException('CakeException');
+		$this->MultiSelect->create();
+
+		$this->Controller->Session->write('MultiSelect', array(
 			'selected' => array(),
 			'search' => array(),
 			'page' => array()
@@ -151,6 +146,7 @@ class MultiSelectTest extends CakeTestCase {
 
 	function testCheckbox() {
 		$this->MultiSelect->selected = array(1);
+		$tokenReg = '(.){13}';
 		$uidReg = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
 
 		$result = $this->MultiSelect->checkbox(2);
@@ -160,8 +156,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => ' multi-select-box',
-				'data-multiselect-token' => 'preg:/[a-z0-9]+/'
+				'data-multiselect-token' => 'preg:/'.$tokenReg.'/',
+				'class' => ' multi-select-box'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -173,8 +169,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => ' multi-select-box',
-				'data-multiselect-token' => 'preg:/[a-z0-9]+/'
+				'data-multiselect-token' => 'preg:/'.$tokenReg.'/',
+				'class' => ' multi-select-box'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -186,8 +182,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => ' multi-select-box',
-				'data-multiselect-token' => 'preg:/[a-z0-9]+/'
+				'data-multiselect-token' => 'preg:/'.$tokenReg.'/',
+				'class' => ' multi-select-box'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -199,8 +195,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => ' multi-select-box',
-				'data-multiselect-token' => 'preg:/[a-z0-9]+/'
+				'data-multiselect-token' => 'preg:/'.$tokenReg.'/',
+				'class' => ' multi-select-box'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -212,8 +208,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => 'myclass multi-select-box',
-				'data-multiselect-token' => 'preg:/[a-z0-9]+/'
+				'data-multiselect-token' => 'preg:/'.$tokenReg.'/',
+				'class' => 'myclass multi-select-box'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -226,8 +222,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 2,
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => ' multi-select-box',
-				'data-multiselect-token' => 'preg:/[a-z0-9]+/'
+				'data-multiselect-token' => 'preg:/'.$tokenReg.'/',
+				'class' => ' multi-select-box'
 			))
 		);
 		$this->assertTags($result, $expected);
@@ -239,8 +235,8 @@ class MultiSelectTest extends CakeTestCase {
 				'name' => 'data[]',
 				'value' => 'all',
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => ' multi-select-box',
-				'data-multiselect-token' => 'preg:/[a-z0-9]+/'
+				'data-multiselect-token' => 'preg:/'.$tokenReg.'/',
+				'class' => ' multi-select-box'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -254,8 +250,8 @@ class MultiSelectTest extends CakeTestCase {
 				'value' => 1,
 				'checked' => 'checked',
 				'id' => 'preg:/'.$uidReg.'/',
-				'class' => ' multi-select-box',
-				'data-multiselect-token' => 'preg:/[a-z0-9]+/'
+				'data-multiselect-token' => 'preg:/'.$tokenReg.'/',
+				'class' => ' multi-select-box'
 			)
 		);
 		$this->assertTags($result, $expected);
@@ -270,8 +266,7 @@ class MultiSelectTest extends CakeTestCase {
 		$this->assertPattern('/\$\('.$selector.'\)\.bind/', $buffer[0]);
 		$this->assertPattern('/\.ajax/', $buffer[0]);
 
-		$this->MultiSelect->Js =& new JsHelper(array('Prototype'));
-		$this->MultiSelect->Js->PrototypeEngine =& new PrototypeEngineHelper();
+		$this->MultiSelect->Js =& new JsHelper($this->View, array('Prototype'));
 		$this->MultiSelect->end();
 		$buffer = $this->MultiSelect->Js->getBuffer();
 		$this->assertPattern('/\$\$\('.$selector.'\)\.observe/', $buffer[0]);
