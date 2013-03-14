@@ -68,7 +68,7 @@ class MultiSelectHelper extends AppHelper {
 	function create() {
 		// check for session key
 		if (!isset($this->request->params['named']['mstoken']) || !CakeSession::check('MultiSelect')) {
-			trigger_error('MultiSelectHelper::create() :: Missing MultiSelect key in session or MultiSelect token. Make sure to include the MultiSelectComponent in your controller file.', E_USER_WARNING);
+			throw new CakeException('MultiSelectHelper::create() :: Missing MultiSelect key in session or MultiSelect token. Make sure to include the MultiSelectComponent in your controller file.');
 		}
 
 		$this->token = $this->request->params['named']['mstoken'];
