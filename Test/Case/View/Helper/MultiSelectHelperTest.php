@@ -25,7 +25,7 @@ App::uses('CakeResponse', 'Network');
  */
 class MultiSelectTest extends CakeTestCase {
 
-	function setUp() {
+	public function setUp() {
 		$request = new CakeRequest('selects/index');
 		$response = new CakeResponse();
 		$this->Controller = new SelectsController($request, $response);
@@ -35,12 +35,12 @@ class MultiSelectTest extends CakeTestCase {
 		$this->MultiSelect = new MultiSelectHelper($this->View);
 	}
 
-	function startTest() {
+	public function startTest() {
 		$this->MultiSelect->request->params['named']['mstoken'] = $this->Controller->MultiSelect->_token;
 		$this->MultiSelect->create();
 	}
 
-	function testCreate() {
+	public function testCreate() {
 		$this->Controller->Session->delete('MultiSelect');
 
 		$this->expectException('CakeException');
@@ -73,7 +73,7 @@ class MultiSelectTest extends CakeTestCase {
 		$this->assertTrue($results);
 	}
 
-	function testCheckedAllBox() {
+	public function testCheckedAllBox() {
 		$uidReg = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
 
 		$this->MultiSelect->selected = array();
@@ -108,7 +108,7 @@ class MultiSelectTest extends CakeTestCase {
 		$this->assertTags($result, $expected);
 	}
 
-	function testCheckbox() {
+	public function testCheckbox() {
 		$this->MultiSelect->selected = array(1);
 		$tokenReg = '(.){13}';
 		$uidReg = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
@@ -221,7 +221,7 @@ class MultiSelectTest extends CakeTestCase {
 		$this->assertTags($result, $expected);
 	}
 
-	function testEnd() {
+	public function testEnd() {
 		$uidReg = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
 		$selector = '\"\.multi-select-box\[data-multiselect-token=[a-z0-9]+\]\"';
 

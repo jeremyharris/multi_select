@@ -26,7 +26,7 @@ App::uses('CakeResponse', 'Network');
  */
 class MultiSelectComponentTest extends CakeTestCase {
 
-	function setUp() {
+	public function setUp() {
 		$request = new CakeRequest('selects/index');
 		$response = new CakeResponse();
 		$this->Controller = new SelectsController($request, $response);
@@ -41,15 +41,15 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->MultiSelect->RequestHandler = $RequestHandler;
 	}
 
-	function tearDown() {
+	public function tearDown() {
 		unset($this->Controller);
 	}
 
-	function startTest($method) {
+	public function startTest($method) {
 		$this->Controller->request->params['named'] = array();
 	}
 
-	function testPostPersist() {
+	public function testPostPersist() {
 		$this->MultiSelect->RequestHandler
 			->expects($this->any())
 			->method('isPost')
@@ -63,7 +63,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertEqual($result, $expected);
 	}
 
-	function testNewSessionOnPost() {
+	public function testNewSessionOnPost() {
 		$this->MultiSelect->RequestHandler
 			->expects($this->any())
 			->method('isPost')
@@ -84,7 +84,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertEqual($result, $expected);
 	}
 
-	function testExpiration() {
+	public function testExpiration() {
 		// persist so we don't create new tokens
 		$this->Controller->request->params['named']['mspersist'] = 1;
 		$this->Controller->request->params['named']['mstoken'] = 'test1';
@@ -130,7 +130,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertEqual($results, $expected);
 	}
 
-	function testStartup() {
+	public function testStartup() {
 		$this->MultiSelect->startup($this->Controller);
 
 		$this->assertTrue($this->MultiSelect->Session->check('MultiSelect'));
@@ -165,13 +165,13 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertTrue($this->MultiSelect->usePages);
 	}
 
-	function testCheck() {
+	public function testCheck() {
 		$this->MultiSelect->startup($this->Controller);
 		$this->assertTrue($this->MultiSelect->check());
 		$this->assertTrue($this->MultiSelect->check($this->MultiSelect->_token));
 	}
 
-	function testSaveSearch() {
+	public function testSaveSearch() {
 		$this->MultiSelect->startup($this->Controller);
 
 		$search = array(
@@ -195,7 +195,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertFalse($this->MultiSelect->saveSearch('notanarray'));
 	}
 
-	function testGetSelected() {
+	public function testGetSelected() {
 		$this->MultiSelect->startup($this->Controller);
 
 		$expected = array('1','2','3');
@@ -203,7 +203,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertEqual($expected, $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected'));
 	}
 
-	function testGetSearch() {
+	public function testGetSearch() {
 		$this->MultiSelect->startup($this->Controller);
 
 		$search = array(
@@ -225,7 +225,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertEqual($this->MultiSelect->getSearch(), $expected);
 	}
 
-	function testGet() {
+	public function testGet() {
 		$this->MultiSelect->startup($this->Controller);
 
 		$expected = array();
@@ -242,7 +242,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertIdentical($result, $expected);
 	}
 
-	function testSave() {
+	public function testSave() {
 		$this->MultiSelect->startup($this->Controller);
 
 		$expected = array('1','2','3');
@@ -250,7 +250,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertEqual($expected, $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected'));
 	}
 
-	function testMerge() {
+	public function testMerge() {
 		$this->MultiSelect->startup($this->Controller);
 
 		$expected = array();
@@ -270,7 +270,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertEqual($expected, $result);
 	}
 
-	function testDelete() {
+	public function testDelete() {
 		$this->MultiSelect->startup($this->Controller);
 
 		$this->MultiSelect->merge(array('1','2','3','4'));
@@ -288,7 +288,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertEqual($expected, $result);
 	}
 
-	function testSelectAll() {
+	public function testSelectAll() {
 		$this->MultiSelect->startup($this->Controller);
 
 		$this->MultiSelect->usePages = true;
@@ -307,7 +307,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertEqual($results, $expected);
 	}
 
-	function testdeselectAll() {
+	public function testdeselectAll() {
 		$this->MultiSelect->startup($this->Controller);
 
 		$this->MultiSelect->usePages = true;

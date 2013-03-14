@@ -18,17 +18,17 @@ App::uses('CakeResponse', 'Network');
 
 class SelectsControllerTestCase extends ControllerTestCase {
 
-	function setUp() {
+	public function setUp() {
 		Router::parseExtensions('json');
 	}
 
-	function tearDown() {
+	public function tearDown() {
 		unset($this->Selects);
 		CakeSession::destroy();
 		ClassRegistry::flush();
 	}
 
-	function generateMock($isAjax = null) {
+	public function generateMock($isAjax = null) {
 		$this->Selects = $this->generate('MultiSelect.Selects', array(
 			'components' => array(
 				'RequestHandler' => array('isAjax', 'isPost')
@@ -48,7 +48,7 @@ class SelectsControllerTestCase extends ControllerTestCase {
 		return $this->Selects;
 	}
 
-	function testNotFound() {
+	public function testNotFound() {
 		$this->generateMock(false);
 
 		// invalid request due to not ajax
@@ -57,7 +57,7 @@ class SelectsControllerTestCase extends ControllerTestCase {
 		$this->assertTrue(empty($this->vars['data']));
 	}
 
-	function testNotFoundWithAjax() {
+	public function testNotFoundWithAjax() {
 		$this->generateMock(true);
 
 		// invalid request due to bad ext
@@ -66,7 +66,7 @@ class SelectsControllerTestCase extends ControllerTestCase {
 		$this->assertTrue(empty($this->vars['data']));
 	}
 
-	function testSession() {
+	public function testSession() {
 		CakeSession::write('MultiSelect.testSession.usePages', true);
 
 		// add a single value

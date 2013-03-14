@@ -26,21 +26,21 @@ class SelectsController extends MultiSelectAppController {
  *
  * @var string
  */
-	var $name = 'Selects';
+	public $name = 'Selects';
 
 /**
  * Disable models for this controller
  *
  * @var array
  */
-	var $uses = array();
+	public $uses = array();
 
 /**
  * Components used by this controller
  *
  * @var array
  */
-	var $components = array(
+	public $components = array(
 		'RequestHandler',
 		'MultiSelect.MultiSelect'
 	);
@@ -51,10 +51,8 @@ class SelectsController extends MultiSelectAppController {
  * ### GET params
  * - 'value' The checkbox value. 'all' for all of the current page.
  * - 'selected' Checkbox selected value
- *
- * @access public
  */
-	function session() {
+	public function session() {
 		$ext = isset($this->request->params['ext']) ? $this->request->params['ext'] : null;
 		if (!$this->RequestHandler->isAjax() || $ext != 'json') {
 			throw new NotFoundException();

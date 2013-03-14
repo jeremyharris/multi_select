@@ -28,44 +28,42 @@ class MultiSelectHelper extends AppHelper {
 /**
  * Additional helpers
  *
- * @var array
+ * @public array
  */
-	var $helpers = array('Form', 'Js');
+	public $helpers = array('Form', 'Js');
 
 /**
  * Ids that should be selected (set automatically by MultiSelectComponent)
  *
- * @var array
+ * @public array
  */
-	var $selected = array();
+	public $selected = array();
 
 /**
  * Current page's ids
  *
- * @var string
+ * @public string
  */
-	var $page = array();
+	public $page = array();
 
 /**
  * Is "check all" active?
  *
- * @var string
+ * @public string
  */
-	var $all = false;
+	public $all = false;
 
 /**
  * The token
  *
- * @var string
+ * @public string
  */
-	var $token = null;
+	public $token = null;
 
 /**
  * Initializes the Helper
- *
- * @access public
  */
-	function create() {
+	public function create() {
 		// check for session key
 		if (!isset($this->request->params['named']['mstoken']) || !CakeSession::check('MultiSelect')) {
 			throw new CakeException('MultiSelectHelper::create() :: Missing MultiSelect key in session or MultiSelect token. Make sure to include the MultiSelectComponent in your controller file.');
@@ -85,9 +83,8 @@ class MultiSelectHelper extends AppHelper {
  * @param mixed $value The id to save, or `all` for a checkbox that selects all
  * @param array $options Array of options to merge with the checkbox
  * @return null|string The generated checkbox widget
- * @access public
  */
-	function checkbox($value = '', $options = array()) {
+	public function checkbox($value = '', $options = array()) {
 		$uid = String::uuid();
 
 		$defaultOptions = array(
@@ -123,10 +120,8 @@ class MultiSelectHelper extends AppHelper {
 
 /**
  * Buffers JavaScript to tie it all together
- *
- * @access public
  */
-	function end() {
+	public function end() {
 		CakeSession::write('MultiSelect.'.$this->token.'.page', $this->page);
 
 		$usePages = CakeSession::read('MultiSelect.'.$this->token.'.usePages');

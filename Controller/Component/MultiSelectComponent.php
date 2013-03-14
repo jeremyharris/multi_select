@@ -35,9 +35,8 @@ class MultiSelectComponent extends Component {
  * Components the MultiSelectComponent uses
  *
  * @var array
- * @access public
  */
-	var $components = array(
+	public $components = array(
 		'Session',
 		'RequestHandler'
 	);
@@ -46,9 +45,8 @@ class MultiSelectComponent extends Component {
  * Current token
  *
  * @var string
- * @access protected
  */
-	var $_token = null;
+	public $_token = null;
 
 /**
  * Changes the behavior of the 'check all' box.
@@ -56,15 +54,14 @@ class MultiSelectComponent extends Component {
  * @var boolean
  * @see README
  */
-	var $usePages = false;
+	public $usePages = false;
 
 /**
  * Creates session keys and removes expired ones
  *
- * @access public
  * @todo check for pagination in url instead of layout
  */
-	function startup($controller) {
+	public function startup($controller) {
 		if (empty($controller->request->params['named'])) {
 			$controller->request->params['named'] = array();
 		}
@@ -103,9 +100,8 @@ class MultiSelectComponent extends Component {
  *
  * @param array $search The search data
  * @return boolean Save success
- * @access public
  */
-	function saveSearch($search = array()) {
+	public function saveSearch($search = array()) {
 		if (!is_array($search)) {
 			return false;
 		}
@@ -119,9 +115,8 @@ class MultiSelectComponent extends Component {
  *
  * @param string $uid The token to get, or null for current
  * @return array Search data that was previously saved
- * @access public
  */
-	function getSearch($uid = null) {
+	public function getSearch($uid = null) {
 		if (!$uid) {
 			$uid = $this->_token;
 		}
@@ -133,9 +128,8 @@ class MultiSelectComponent extends Component {
  *
  * @param string $uid The token to get, or null for current
  * @return mixed Array of ids, or `all`
- * @access public
  */
-	function getSelected($uid = null) {
+	public function getSelected($uid = null) {
 		if (!$uid) {
 			$uid = $this->_token;
 		}
@@ -151,9 +145,8 @@ class MultiSelectComponent extends Component {
  *
  * @param $uid The id to check, if any
  * @return boolean Exists?
- * @access public
  */
-	function check($uid = null) {
+	public function check($uid = null) {
 		if (!$uid) {
 			$uid = $this->_token;
 		}
@@ -165,9 +158,8 @@ class MultiSelectComponent extends Component {
  *
  * @param array $data Array of ids
  * @return array New data
- * @access public
  */
-	function merge($data = array()) {
+	public function merge($data = array()) {
 		$cache = array_values(array_unique(array_merge($this->_get(), $data)));
 		$this->_save($cache);
 		return $cache;
@@ -178,9 +170,8 @@ class MultiSelectComponent extends Component {
  *
  * @param array $data Array of ids
  * @return array New data
- * @access public
  */
-	function delete($data = array()) {
+	public function delete($data = array()) {
 		$cache = array_values(array_diff($this->_get(), $data));
 		$this->_save($cache);
 		return $cache;
@@ -190,9 +181,8 @@ class MultiSelectComponent extends Component {
  * Saves current page into selected
  *
  * @return boolean Set success
- * @access public
  */
-	function selectAll() {
+	public function selectAll() {
 		if ($this->usePages) {
 			return $this->merge($this->Session->read('MultiSelect.'.$this->_token.'.page'));
 		} else {
@@ -205,9 +195,8 @@ class MultiSelectComponent extends Component {
  * Removes current page from selected
  *
  * @return boolean Reset success
- * @access public
  */
-	function deselectAll() {
+	public function deselectAll() {
 		if ($this->usePages) {
 			return $this->delete($this->Session->read('MultiSelect.'.$this->_token.'.page'));
 		} else {
@@ -221,9 +210,8 @@ class MultiSelectComponent extends Component {
  *
  * @param array $data Array of ids
  * @return boolean Write success
- * @access private
  */
-	function _save($data = array()) {
+	public function _save($data = array()) {
 		return $this->Session->write('MultiSelect.'.$this->_token.'.selected', $data);
 	}
 
@@ -231,9 +219,8 @@ class MultiSelectComponent extends Component {
  * Gets ids from the session key
  *
  * @return array Array of ids
- * @access private
  */
-	function _get($uid = null) {
+	public function _get($uid = null) {
 		if (!$uid) {
 			$uid = $this->_token;
 		}
