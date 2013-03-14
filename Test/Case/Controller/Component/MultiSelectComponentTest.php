@@ -19,47 +19,6 @@ App::uses('CakeRequest', 'Network');
 App::uses('CakeResponse', 'Network');
 
 /**
- * MultiSelectComponentTestController class
- *
- * @package       multi_select
- * @subpackage    multi_select.tests.cases.components
- */
-class MultiSelectComponentTestController extends Controller {
-
-/**
- * name property
- *
- * @var string
- * @access public
- */
-	var $name = 'TheMultiSelectComponentTestController';
-
-/**
- * uses property
- *
- * @var mixed null
- * @access public
- */
-	var $uses = null;
-
-/**
- * construct method
- *
- * @param array $params
- * @access private
- * @return void
- */
-	function __construct($params = array()) {
-		foreach ($params as $key => $val) {
-			$this->{$key} = $val;
-		}
-		parent::__construct();
-	}
-}
-
-Mock::generatePartial('RequestHandlerComponent', 'MockMultiSelectComponentRequestHandlerComponent', array('isPost'));
-
-/**
  * MultiSelectComponentTest class
  *
  * @package       multi_select
@@ -67,66 +26,69 @@ Mock::generatePartial('RequestHandlerComponent', 'MockMultiSelectComponentReques
  */
 class MultiSelectComponentTest extends CakeTestCase {
 
-	function startCase() {
-		$this->Controller =& new MultiSelectComponentTestController(array('components' => array('RequestHandler')));
+	function setUp() {
+		$request = new CakeRequest('selects/index');
+		$response = new CakeResponse();
+		$this->Controller = new SelectsController($request, $response);
 		$this->Controller->constructClasses();
-		$this->View =& new View($this->Controller);
-		$this->MultiSelect =& new MultiSelectComponent($this->Controller);
-		$this->MultiSelect->initialize($this->Controller);
-		$this->MultiSelect->Session =& new SessionComponent();
-		$this->MultiSelect->RequestHandler =& new MockMultiSelectComponentRequestHandlerComponent();
-		$this->MultiSelect->RequestHandler->initialize($this->Controller);
+		$this->MultiSelect = $this->Controller->Components->MultiSelect;
+
+		$RequestHandler = $this->getMockBuilder('RequestHandlerComponent')
+			->setMethods(array('isPost'))
+			->setConstructorArgs(array($this->Controller->Components))
+			->getMock();
+
+		$this->MultiSelect->RequestHandler = $RequestHandler;
 	}
 
-	function startTest() {
-		unset($this->Controller->params['named']['mstoken']);
-		unset($this->Controller->params['named']['mspersist']);
-		$this->MultiSelect->RequestHandler =& new MockMultiSelectComponentRequestHandlerComponent();
-		$this->MultiSelect->RequestHandler->initialize($this->Controller);
-		$this->MultiSelect->startup();
+	function tearDown() {
+		unset($this->Controller);
+	}
+
+	function startTest($method) {
+		$this->Controller->request->params['named'] = array();
 	}
 
 	function testPostPersist() {
-		$this->MultiSelect->RequestHandler->setReturnValue('isPost', true);
-		$this->Controller->params['named']['mspersist'] = 1;
-		$this->Controller->params['named']['mstoken'] = $this->MultiSelect->_token;
+		$this->MultiSelect->RequestHandler
+			->expects($this->any())
+			->method('isPost')
+			->will($this->returnValue(true));
+		$this->Controller->request->params['named']['mspersist'] = 1;
+		$this->Controller->request->params['named']['mstoken'] = $this->MultiSelect->_token;
 		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.selected', array(1));
-		$this->MultiSelect->startup();
+		$this->MultiSelect->startup($this->Controller);
 		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected');
 		$expected = array(1);
 		$this->assertEqual($result, $expected);
 	}
 
 	function testNewSessionOnPost() {
-		$this->MultiSelect->RequestHandler->setReturnValueAt(0, 'isPost', false);
-		$this->Controller->params['named']['mstoken'] = $this->MultiSelect->_token;
-		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.selected', array(1));
-		$this->MultiSelect->startup();
+		$this->MultiSelect->RequestHandler
+			->expects($this->any())
+			->method('isPost')
+			->will($this->onConsecutiveCalls(false, true));
+
+		$this->Controller->request->params['named']['mstoken'] = 'testtoken';
+		$this->MultiSelect->Session->write('MultiSelect.testtoken.selected', array(1));
+		$this->MultiSelect->startup($this->Controller);
 		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token);
-		unset($result['created']);
 		$expected = array(
-			'selected' => array(1),
-			'search' => array(),
-			'page' => array(),
-			'usePages' => false,
-			'all' => false
+			'selected' => array(1)
 		);
 		$this->assertEqual($result, $expected);
 
-		$this->MultiSelect->RequestHandler->setReturnValueAt(1, 'isPost', false);
-		$this->MultiSelect->startup();
-		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected');
-		$expected = array(1);
-		$this->assertEqual($result, $expected);
-
-		$this->MultiSelect->RequestHandler->setReturnValueAt(2, 'isPost', true);
-		$this->MultiSelect->startup();
+		$this->MultiSelect->startup($this->Controller);
 		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected');
 		$expected = array();
 		$this->assertEqual($result, $expected);
 	}
 
 	function testExpiration() {
+		// persist so we don't create new tokens
+		$this->Controller->request->params['named']['mspersist'] = 1;
+		$this->Controller->request->params['named']['mstoken'] = 'test1';
+
 		$tokens = array(
 			'test1' => array(
 				'selected' => array(),
@@ -148,7 +110,7 @@ class MultiSelectComponentTest extends CakeTestCase {
 			)
 		);
 		$this->MultiSelect->Session->write('MultiSelect', $tokens);
-		$this->MultiSelect->startup();
+		$this->MultiSelect->startup($this->Controller);
 
 		$results = $this->MultiSelect->Session->read('MultiSelect');
 		$expected = array(
@@ -169,8 +131,10 @@ class MultiSelectComponentTest extends CakeTestCase {
 	}
 
 	function testStartup() {
+		$this->MultiSelect->startup($this->Controller);
+
 		$this->assertTrue($this->MultiSelect->Session->check('MultiSelect'));
-		$this->assertIsA($this->MultiSelect->_token, 'string');
+		$this->assertTrue(!is_null($this->MultiSelect->_token));
 		$now = time();
 		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token);
 		$expected = array(
@@ -183,10 +147,10 @@ class MultiSelectComponentTest extends CakeTestCase {
 		);
 		$this->assertEqual($result, $expected);
 
-		$this->Controller->params['named']['mstoken'] = $this->MultiSelect->_token;
+		$this->Controller->request->params['named']['mstoken'] = $this->MultiSelect->_token;
 		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.page', array(1));
 		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.usePages', true);
-		$this->MultiSelect->startup();
+		$this->MultiSelect->startup($this->Controller);
 		$result = $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token);
 		$expected = array(
 			'selected' => array(),
@@ -202,11 +166,14 @@ class MultiSelectComponentTest extends CakeTestCase {
 	}
 
 	function testCheck() {
+		$this->MultiSelect->startup($this->Controller);
 		$this->assertTrue($this->MultiSelect->check());
 		$this->assertTrue($this->MultiSelect->check($this->MultiSelect->_token));
 	}
 
 	function testSaveSearch() {
+		$this->MultiSelect->startup($this->Controller);
+
 		$search = array(
 			'conditions' => array(
 				'User.id' => array(1,2,3)
@@ -229,12 +196,16 @@ class MultiSelectComponentTest extends CakeTestCase {
 	}
 
 	function testGetSelected() {
+		$this->MultiSelect->startup($this->Controller);
+
 		$expected = array('1','2','3');
 		$this->MultiSelect->_save($expected);
 		$this->assertEqual($expected, $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected'));
 	}
 
 	function testGetSearch() {
+		$this->MultiSelect->startup($this->Controller);
+
 		$search = array(
 			'conditions' => array(
 				'User.id' => array(1,2,3)
@@ -255,6 +226,8 @@ class MultiSelectComponentTest extends CakeTestCase {
 	}
 
 	function testGet() {
+		$this->MultiSelect->startup($this->Controller);
+
 		$expected = array();
 		$result = $this->MultiSelect->_get();
 		$this->assertEqual($expected, $result);
@@ -269,13 +242,17 @@ class MultiSelectComponentTest extends CakeTestCase {
 		$this->assertIdentical($result, $expected);
 	}
 
-	function test_save() {
+	function testSave() {
+		$this->MultiSelect->startup($this->Controller);
+
 		$expected = array('1','2','3');
 		$this->assertTrue($this->MultiSelect->_save($expected));
 		$this->assertEqual($expected, $this->MultiSelect->Session->read('MultiSelect.'.$this->MultiSelect->_token.'.selected'));
 	}
 
 	function testMerge() {
+		$this->MultiSelect->startup($this->Controller);
+
 		$expected = array();
 		$result = $this->MultiSelect->merge(array());
 		$this->assertEqual($expected, $result);
@@ -294,6 +271,8 @@ class MultiSelectComponentTest extends CakeTestCase {
 	}
 
 	function testDelete() {
+		$this->MultiSelect->startup($this->Controller);
+
 		$this->MultiSelect->merge(array('1','2','3','4'));
 
 		$expected = array('1','2','3','4');
@@ -310,6 +289,8 @@ class MultiSelectComponentTest extends CakeTestCase {
 	}
 
 	function testSelectAll() {
+		$this->MultiSelect->startup($this->Controller);
+
 		$this->MultiSelect->usePages = true;
 		$this->MultiSelect->merge(array('1','2','3'));
 		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.page', array('4','5','6'));
@@ -327,6 +308,8 @@ class MultiSelectComponentTest extends CakeTestCase {
 	}
 
 	function testdeselectAll() {
+		$this->MultiSelect->startup($this->Controller);
+
 		$this->MultiSelect->usePages = true;
 		$this->MultiSelect->merge(array('1','2','3','4','5','6'));
 		$this->MultiSelect->Session->write('MultiSelect.'.$this->MultiSelect->_token.'.page', array('4','5','6'));
