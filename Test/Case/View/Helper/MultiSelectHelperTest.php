@@ -18,42 +18,6 @@ App::uses('CakeRequest', 'Network');
 App::uses('CakeResponse', 'Network');
 
 /**
- * TheMultiSelectTestController class
- *
- * @package       multi_select
- * @subpackage    multi_select.tests.cases.helpers
- */
-class TheMultiSelectTestController extends SelectsController {
-
-/**
- * Name
- *
- * @var string
- * @access public
- */
-	var $name = 'TheMultiSelectTest';
-
-/**
- * No model
- *
- * @var string
- */
-	var $uses = null;
-
-/**
- * Components
- *
- * @var array
- * @access public
- */
-	var $components = array(
-		'Session',
-		'RequestHandler',
-		'MultiSelect.MultiSelect'
-	);
-}
-
-/**
  * MultiSelectTest class
  *
  * @package       multi_select
