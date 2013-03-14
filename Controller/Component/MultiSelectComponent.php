@@ -32,14 +32,6 @@ App::uses('Component', 'Controller');
 class MultiSelectComponent extends Component {
 
 /**
- * A stored reference to the calling controller
- *
- * @var object
- * @access public
- */
-	var $controller = null;
-
-/**
  * Components the MultiSelectComponent uses
  *
  * @var array
