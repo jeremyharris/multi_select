@@ -9,6 +9,7 @@
  */
 
 App::uses('AppHelper', 'View/Helper');
+App::uses('CakeSession', 'Model/Datasource');
 
 /**
  * MultiSelect Helper
@@ -29,7 +30,7 @@ class MultiSelectHelper extends AppHelper {
  *
  * @var array
  */
-	var $helpers = array('Session', 'Form', 'Js');
+	var $helpers = array('Form', 'Js');
 
 /**
  * Ids that should be selected (set automatically by MultiSelectComponent)
@@ -66,16 +67,16 @@ class MultiSelectHelper extends AppHelper {
  */
 	function create() {
 		// check for session key
-		if (!isset($this->request->params['named']['mstoken']) || !$this->Session->check('MultiSelect')) {
+		if (!isset($this->request->params['named']['mstoken']) || !CakeSession::check('MultiSelect')) {
 			trigger_error('MultiSelectHelper::create() :: Missing MultiSelect key in session or MultiSelect token. Make sure to include the MultiSelectComponent in your controller file.', E_USER_WARNING);
 		}
 
 		$this->token = $this->request->params['named']['mstoken'];
 
-		$this->all = $this->Session->read('MultiSelect.'.$this->token.'.all');
+		$this->all = CakeSession::read('MultiSelect.'.$this->token.'.all');
 
 		// get cache and store
-		$this->selected = $this->Session->read('MultiSelect.'.$this->token.'.selected');
+		$this->selected = CakeSession::read('MultiSelect.'.$this->token.'.selected');
 	}
 
 /**
@@ -126,11 +127,9 @@ class MultiSelectHelper extends AppHelper {
  * @access public
  */
 	function end() {
-		App::import('Component', 'Session');
-		$Session = new SessionComponent();
-		$Session->write('MultiSelect.'.$this->token.'.page', $this->page);
+		CakeSession::write('MultiSelect.'.$this->token.'.page', $this->page);
 
-		$usePages = $Session->read('MultiSelect.'.$this->token.'.usePages');
+		$usePages = CakeSession::read('MultiSelect.'.$this->token.'.usePages');
 
 		$url = Router::url(array(
 			'controller' => 'selects',
