@@ -72,8 +72,8 @@ class MultiSelectComponent extends Component {
  * @param object $controller A reference to the controller
  * @access public
  */
-	function initialize(&$controller,  $settings = array()) {
-		$this->controller =& $controller;
+	function initialize($controller,  $settings = array()) {
+		$controller = $controller;
 		$this->_set($settings);
 	}
 
@@ -83,9 +83,9 @@ class MultiSelectComponent extends Component {
  * @access public
  * @todo check for pagination in url instead of layout
  */
-	function startup() {
-		if (!isset($this->controller->params['named'])) {
-			$this->controller->params['named'] = array();
+	function startup($controller) {
+		if (empty($controller->request->params['named'])) {
+			$controller->request->params['named'] = array();
 		}
 
 		if ($this->Session->check('MultiSelect')) {
@@ -98,11 +98,11 @@ class MultiSelectComponent extends Component {
 			}
 		}
 
-		$newRequest = !isset($this->controller->params['named']['mstoken']) || $this->RequestHandler->isPost();
+		$newRequest = !isset($controller->request->params['named']['mstoken']) || $this->RequestHandler->isPost();
 
-		if ($newRequest && !isset($this->controller->params['named']['mspersist'])) {
+		if ($newRequest && !isset($controller->request->params['named']['mspersist'])) {
 			$this->_token = uniqid();
-			$this->controller->params['named']['mstoken'] = $this->_token;
+			$controller->request->params['named']['mstoken'] = $this->_token;
 			$success = $this->Session->write('MultiSelect.'.$this->_token, array(
 				'selected' => array(),
 				'search' => array(),
@@ -112,7 +112,7 @@ class MultiSelectComponent extends Component {
 				'all' => false
 			));
 		} else {
-			$this->_token = $this->controller->params['named']['mstoken'];
+			$this->_token = $controller->request->params['named']['mstoken'];
 			$this->usePages = $this->Session->read('MultiSelect.'.$this->_token.'.usePages');
 		}
 	}
