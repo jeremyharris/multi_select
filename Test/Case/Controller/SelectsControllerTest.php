@@ -13,123 +13,99 @@
  */
 App::uses('SelectsController', 'MultiSelect.Controller');
 App::uses('RequestHandlerComponent', 'Controller/Component');
+App::uses('CakeRequest', 'Network');
+App::uses('CakeResponse', 'Network');
 
-Mock::generatePartial('RequestHandlerComponent', 'MockRequestHandlerComponent', array('isAjax'));
+class SelectsControllerTestCase extends ControllerTestCase {
 
-class TestSelectsController extends SelectsController {
-	var $autoRender = false;
-
-	var $components = array(
-		'MultiSelect.MultiSelect' => array(
-			'usePages' => true
-		)
-	);
-
-	function redirect($url, $status = null, $exit = true) {
-		$this->redirectUrl = $url;
+	function setUp() {
+		Router::parseExtensions('json');
 	}
 
-	function cakeError($type = '') {
-		$this->cakeError = $type;
-	}
-}
-
-class SelectsControllerTestCase extends CakeTestCase {
-
-	function startTest() {
-		$this->Selects =& new TestSelectsController();
-		$this->Selects->constructClasses();
-		$this->Selects->Component->initialize($this->Selects);
-		$this->Selects->RequestHandler = new MockRequestHandlerComponent();
-		$this->Selects->RequestHandler->ext = 'json';
-	}
-
-	function endTest() {
+	function tearDown() {
 		unset($this->Selects);
+		CakeSession::destroy();
 		ClassRegistry::flush();
 	}
 
-	function _reset() {
-		$this->Selects->params['url'] = $this->viewVars = array();
-		$this->redirectUrl = $this->cakeError = null;
-		$this->Selects->MultiSelect->startup();
+	function generateMock($isAjax = null) {
+		$this->Selects = $this->generate('MultiSelect.Selects', array(
+			'components' => array(
+				'RequestHandler' => array('isAjax', 'isPost')
+			)
+		));
+		if (!is_null($isAjax)) {
+			$this->Selects->RequestHandler
+				->expects($this->any())
+				->method('isAjax')
+				->will($this->returnValue($isAjax));
+		}
+		// persist across requests
+		$this->Selects->RequestHandler
+			->expects($this->any())
+			->method('isPost')
+			->will($this->returnValue(false));
+		return $this->Selects;
+	}
+
+	function testNotFound() {
+		$this->generateMock(false);
+
+		// invalid request due to not ajax
+		$this->expectException('NotFoundException');
+		$this->testAction('/multi_select/selects/session.json');
+		$this->assertTrue(empty($this->vars['data']));
+	}
+
+	function testNotFoundWithAjax() {
+		$this->generateMock(true);
+
+		// invalid request due to bad ext
+		$this->expectException('NotFoundException');
+		$this->testAction('/multi_select/selects/session');
+		$this->assertTrue(empty($this->vars['data']));
 	}
 
 	function testSession() {
-		// invalid request
-		$this->_reset();
-		$this->Selects->session();
-		$this->assertTrue(empty($this->Selects->viewVars['data']));
-		$this->assertEqual($this->Selects->cakeError, 'error404');
-
-		$this->Selects->RequestHandler->setReturnValue('isAjax', true);
-
-		// invalid request
-		$this->_reset();
-		$this->Selects->session();
-		$this->assertTrue(empty($this->Selects->viewVars['data']));
-		$this->assertEqual($this->Selects->cakeError, 'error404');
+		CakeSession::write('MultiSelect.testSession.usePages', true);
 
 		// add a single value
-		$this->_reset();
-		$this->Selects->params['url'] = array(
-			'value' => '1',
-			'selected' => 'true'
-		);
-		$this->Selects->session();
-		sort($this->Selects->viewVars['data']);
-		$this->assertEqual($this->Selects->viewVars['data'], array(1));
+		$this->generateMock(true);
+		$this->testAction('/multi_select/selects/session/mstoken:testSession.json?value=1&selected=true');
+		sort($this->vars['data']);
+		$this->assertEqual($this->vars['data'], array(1));
 
-		// add a single value
-		$this->_reset();
-		$this->Selects->params['url'] = array(
-			'value' => '2',
-			'selected' => 'true'
-		);
-		$this->Selects->session();
-		sort($this->Selects->viewVars['data']);
-		$this->assertEqual($this->Selects->viewVars['data'], array(1, 2));
+		// add another value
+		$this->generateMock(true);
+		$this->testAction('/multi_select/selects/session/mstoken:testSession.json?value=2&selected=true');
+		sort($this->vars['data']);
+		$this->assertEqual($this->vars['data'], array(1, 2));
 
-		// remove a single value
-		$this->_reset();
-		$this->Selects->params['url'] = array(
-			'value' => '1',
-			'selected' => 'false'
-		);
-		$this->Selects->session();
-		sort($this->Selects->viewVars['data']);
-		$this->assertEqual($this->Selects->viewVars['data'], array(2));
+		// add another value
+		$this->generateMock(true);
+		$this->testAction('/multi_select/selects/session/mstoken:testSession.json?value=2&selected=false');
+		sort($this->vars['data']);
+		$this->assertEqual($this->vars['data'], array(1));
 
-		$this->Selects->Session->write('MultiSelect.'.$this->Selects->MultiSelect->_token.'.page', array(1,2,3,4,5));
-		// add all of current page
-		$this->_reset();
-		$this->Selects->params['url'] = array(
-			'value' => 'all',
-			'selected' => 'true'
-		);
-		$this->Selects->session();
-		sort($this->Selects->viewVars['data']);
-		$this->assertEqual($this->Selects->viewVars['data'], array(1,2,3,4,5));
+		// make a page
+		$this->Selects->Session->write('MultiSelect.testSession.page', array(1,2,3,4,5));
+		// add the current page
+		$this->generateMock(true);
+		$this->testAction('/multi_select/selects/session/mstoken:testSession.json?value=all&selected=true');
+		sort($this->vars['data']);
+		$this->assertEqual($this->vars['data'], array(1,2,3,4,5));
 
-		// add another
-		$this->_reset();
-		$this->Selects->params['url'] = array(
-			'value' => '6',
-			'selected' => 'true'
-		);
-		$this->Selects->session();
-		sort($this->Selects->viewVars['data']);
-		$this->assertEqual($this->Selects->viewVars['data'], array(1,2,3,4,5,6));
+		// add another single value
+		$this->generateMock(true);
+		$this->testAction('/multi_select/selects/session/mstoken:testSession.json?value=6&selected=true');
+		sort($this->vars['data']);
+		$this->assertEqual($this->vars['data'], array(1,2,3,4,5,6));
 
-		// remove page
-		$this->_reset();
-		$this->Selects->params['url'] = array(
-			'value' => 'all',
-			'selected' => 'false'
-		);
-		$this->Selects->session();
-		sort($this->Selects->viewVars['data']);
-		$this->assertEqual($this->Selects->viewVars['data'], array(6));
+		// deselect page
+		$this->generateMock(true);
+		$this->testAction('/multi_select/selects/session/mstoken:testSession.json?value=all&selected=false');
+		sort($this->vars['data']);
+		$this->assertEqual($this->vars['data'], array(6));
 	}
 
 }

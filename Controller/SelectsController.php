@@ -55,22 +55,22 @@ class SelectsController extends MultiSelectAppController {
  * @access public
  */
 	function session() {
-		if (!$this->RequestHandler->isAjax() || $this->RequestHandler->ext != 'json') {
-			$this->cakeError('error404');
+		$ext = isset($this->request->params['ext']) ? $this->request->params['ext'] : null;
+		if (!$this->RequestHandler->isAjax() || $ext != 'json') {
+			throw new NotFoundException();
 			return;
 		}
 
-		$this->request->params['url'] += array('value' => null, 'selected' => null);
-
-		if ($this->request->params['url']['value'] == null || $this->request->params['url']['selected'] == null) {
+		$this->request->query += array('value' => null, 'selected' => null);
+		if ($this->request->query['value'] == null || $this->request->query['selected'] == null) {
 			$data = array();
 		} else {
-			if ($this->request->params['url']['value'] == 'all') {
-				$action = $this->request->params['url']['selected'] == 'true' ? 'selectAll' : 'deselectAll';
+			if ($this->request->query['value'] == 'all') {
+				$action = $this->request->query['selected'] == 'true' ? 'selectAll' : 'deselectAll';
 			} else {
-				$action = $this->request->params['url']['selected'] == 'true' ? 'merge' : 'delete';
+				$action = $this->request->query['selected'] == 'true' ? 'merge' : 'delete';
 			}
-			$data = $this->MultiSelect->{$action}(array($this->request->params['url']['value']));
+			$data = $this->MultiSelect->{$action}(array($this->request->query['value']));
 		}
 
 		$this->set('data', $data);
